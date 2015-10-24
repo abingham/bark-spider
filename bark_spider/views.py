@@ -1,8 +1,8 @@
 from io import BytesIO, StringIO
 
+import pandas
 from pyramid.response import Response
 from pyramid.view import view_config
-
 
 from brooks.brooks_law import step
 import brooks.communication
@@ -59,27 +59,22 @@ def main_plot(request):
     return {'project': 'bark_spider'}
 
 
-@view_config(route_name='simulate')
+@view_config(route_name='simulate',
+             request_method='POST')
 def simulate_route(request):
-    elapsed = int(request.matchdict['elapsed'])
-    added = int(request.matchdict['added'])
-
     attributes = ['software_development_rate']
+    elapsed = request.json_body['elapsed']
+    added = request.json_body['added']
 
     output_stream = StringIO()
 
     simulate(Schedule(elapsed, added), step, output_stream, attributes)
+
+    output_stream.seek(0)
+    # TODO: The first entry in the dataframe has None for development rate. What does plotter do?
+
+    print(output_stream.read())
     output_stream.seek(0)
 
-    output_image = BytesIO()
-
-    plot_timeseries(tsvs=[(output_stream, "this is a stream name")],
-                    attribute=attributes[0],
-                    time_attr='elapsed_time',
-                    start_color=1,
-                    output=output_image)
-    output_image.seek(0)
-
-    resp = Response(body=output_image.read(),
-                    content_type='image/png')
-    return resp
+    frame = pandas.read_table(output_stream)
+    return Response(body=frame.to_json(), content_type='text/json')

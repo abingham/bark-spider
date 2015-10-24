@@ -10,6 +10,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-chart.js/0.8.5/angular-chart.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
         
         <script src="static/js/app.js"></script>
         <script src="static/js/controllers.js"></script>
@@ -57,10 +58,12 @@
                     <button type="submit" class="btn btn-default">Sign in</button>
                     </div>
                     </div> -->
+                    <button type="submit" class="btn btn-default" ng-click="simulate()">Simulate</button>
                 </form>
                 <canvas id="software-development-rate-chart" class="chart chart-line" chart-data="data"
                         chart-labels="labels" chart-legend="true" chart-series="series"
-                        chart-click="onClick" >
+                        chart-click="onClick"
+                        chart-options="options">
                 </canvas> 
             </div>
         </div>
