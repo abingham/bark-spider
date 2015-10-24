@@ -15,8 +15,7 @@
              $scope.series = [];
              $scope.data = [];
              $scope.options = {
-                 pointDot: false,
-                 scaleStepsWidth: 100
+                 pointDot: false
              };
 
              $scope.simulate = function() {
