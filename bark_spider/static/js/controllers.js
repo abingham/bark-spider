@@ -11,8 +11,15 @@
              $scope.simulations.push({
                  name: 'software_development_rate',
                  assimilation_delay: 20,
-                 elapsed: 0,
-                 added: 0
+                 elapsed: 100,
+                 added: 10
+             });
+
+             $scope.simulations.push({
+                 name: 'software_development_rate',
+                 assimilation_delay: 20,
+                 elapsed: 100,
+                 added: 20
              });
 
              $scope.labels = [];
