@@ -54,8 +54,8 @@ class Schedule:
         return state
 
 
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
-def my_view(request):
+@view_config(route_name='home', renderer='templates/main_plot.pt')
+def main_plot(request):
     return {'project': 'bark_spider'}
 
 
