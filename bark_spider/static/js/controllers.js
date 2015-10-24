@@ -7,9 +7,13 @@
         'BarkSpiderCtrl',
         ['$scope', '$http',
          function($scope, $http) {
-             $scope.assimilation_delay = 20;
-             $scope.elapsed = 0;
-             $scope.added = 0;
+             $scope.simulations = [];
+             $scope.simulations.push({
+                 name: 'software_development_rate',
+                 assimilation_delay: 20,
+                 elapsed: 0,
+                 added: 0
+             });
 
              $scope.labels = [];
              $scope.series = [];
@@ -23,23 +27,32 @@
                      method: 'POST',
                      url: '/simulate',
                      data: JSON.stringify({
-                         elapsed: $scope.elapsed,
-                         added: $scope.added
+                         simulation_parameter_sets: $scope.simulations
                      }),
                      headers: {
                          'Content-Type': 'application/json'
                      }
                  }).then(function successCallback(response) {
                      console.log(response);
-                     $scope.labels = _.values(response.data.elapsed_time);
-                     $scope.series = ['software development rate'];
 
-                     var rates = _.values(response.data.software_development_rate);
+                     // TODO: How should we merge elapsed times? Should we at all?
+                     $scope.labels = _.values(response.data[0].elapsed_time);
 
-                     $scope.data = [rates];
+                     $scope.series = _.map(
+                         response.data,
+                         function(r) {
+                             // TODO: How should we communicate series names?
+                             return 'software development rate';
+                         });
+
+                     $scope.data = _.map(
+                         response.data,
+                         function(r) {
+                             return _.values(r.software_development_rate);
+                         });
 
                  }, function errorCallback(response) {
-                     var y = 4;
+                     // TODO: on error...
                  });
 
              };

@@ -59,20 +59,25 @@ def main_plot(request):
     return {'project': 'bark_spider'}
 
 
-@view_config(route_name='simulate',
-             request_method='POST')
-def simulate_route(request):
-    attributes = ['software_development_rate']
-    elapsed = request.json_body['elapsed']
-    added = request.json_body['added']
+def _run_simulation(params):
+    attributes = [params['name']]
+    elapsed = params['elapsed']
+    added = params['added']
 
     output_stream = StringIO()
-
     simulate(Schedule(elapsed, added), step, output_stream, attributes)
-
     output_stream.seek(0)
 
     frame = pandas.read_table(output_stream)
-    frame['software_development_rate'][0] = 0 # This cleans up the null initial rate
+    frame['software_development_rate'][0] = 0  # This cleans up the null initial rate
+    return frame
 
-    return Response(body=frame.to_json(), content_type='text/json')
+
+import json
+
+@view_config(route_name='simulate',
+             request_method='POST',
+             renderer='json')
+def simulate_route(request):
+    params = request.json_body['simulation_parameter_sets']
+    return [json.loads(_run_simulation(p).to_json()) for p in params]

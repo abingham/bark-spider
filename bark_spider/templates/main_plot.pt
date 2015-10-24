@@ -23,19 +23,19 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Assimilation delay (days)</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="number" min="0" value="20" ng-model="assimilation_delay"/>
+                            <input class="form-control" type="number" min="0" value="20" ng-model="simulations[0].assimilation_delay"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label"># days elapsed</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="number" min="0" value="0" ng-model="elapsed"/>
+                            <input class="form-control" type="number" min="0" value="0" ng-model="simulations[0].elapsed"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label"># devs added</label>
                         <div class="col-sm-10">
-                            <input class="form-control" type="number" min="0" value="0" ng-model="added"/>
+                            <input class="form-control" type="number" min="0" value="0" ng-model="simulations[0].added"/>
                         </div>
                     </div>
                     <!-- <div class="form-group">
