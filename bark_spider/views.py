@@ -72,6 +72,7 @@ def simulate_route(request):
     output_stream.seek(0)
 
     output_image = BytesIO()
+
     plot_timeseries(tsvs=[(output_stream, "this is a stream name")],
                     attribute=attributes[0],
                     time_attr='elapsed_time',
