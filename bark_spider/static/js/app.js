@@ -4,6 +4,7 @@
     var barkSpiderApp = angular.module(
         'BarkSpiderApp',
         [
-            'barkSpiderControllers'
+            'barkSpiderControllers',
+            'chart.js'
         ]);
 }());
