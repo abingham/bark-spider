@@ -35,16 +35,7 @@
                      $scope.labels = _.values(response.data.elapsed_time);
                      $scope.series = ['software development rate'];
 
-                     var rates = _.map(
-                         _.values(response.data.software_development_rate),
-                         function(r) {
-                             if (r == 'None') {
-                                 return 0;
-                             }
-                             else {
-                                 return Number(r);
-                             }
-                         });
+                     var rates = _.values(response.data.software_development_rate);
 
                      $scope.data = [rates];
 

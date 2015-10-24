@@ -71,10 +71,8 @@ def simulate_route(request):
     simulate(Schedule(elapsed, added), step, output_stream, attributes)
 
     output_stream.seek(0)
-    # TODO: The first entry in the dataframe has None for development rate. What does plotter do?
-
-    print(output_stream.read())
-    output_stream.seek(0)
 
     frame = pandas.read_table(output_stream)
+    frame['software_development_rate'][0] = 0 # This cleans up the null initial rate
+
     return Response(body=frame.to_json(), content_type='text/json')
