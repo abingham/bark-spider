@@ -63,7 +63,7 @@ def main_plot(request):
 
 
 def _run_simulation(params):
-    attributes = [params['name']]
+    attributes = ['software_development_rate']
     elapsed = params['elapsed']
     added = params['added']
 
@@ -80,7 +80,7 @@ def _run_simulation(params):
              request_method='POST')
 def simulate_route(request):
     params = request.json_body['simulation_parameter_sets']
-    results = [_run_simulation(p) for p in params]
+    results = {p['name']: _run_simulation(p) for p in params}
     return Response(
         body=json.dumps(results, cls=DataFrameJSONEncoder),
         content_type='application/json')

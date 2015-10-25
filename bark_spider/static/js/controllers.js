@@ -9,14 +9,14 @@
          function($scope, $http) {
              $scope.simulations = [];
              $scope.simulations.push({
-                 name: 'software_development_rate',
+                 name: '+10 @ 100d',
                  assimilation_delay: 20,
                  elapsed: 100,
                  added: 10
              });
 
              $scope.simulations.push({
-                 name: 'software_development_rate',
+                 name: '+20 @ 100d',
                  assimilation_delay: 20,
                  elapsed: 100,
                  added: 20
@@ -42,36 +42,23 @@
                  }).then(function successCallback(response) {
                      console.log(response);
 
-                     // TODO: How should we merge elapsed times? Should we at all?
-                     $scope.labels = _.values(response.data[0].elapsed_time);
+                     // TODO: How should we merge elapsed times? Should we at all? We need to pick the longest.
+                     var first_series = _.values(response.data)[0];
+                     $scope.labels = _.values(first_series.elapsed_time);
 
-                     $scope.series = _.map(
-                         response.data,
-                         function(r) {
-                             // TODO: How should we communicate series names?
-                             return 'software development rate';
+                     $scope.series = [];
+                     $scope.data = [];
+
+                     _.map(
+                         _.pairs(response.data),
+                         function (p) {
+                             $scope.series.push(p[0]);
+                             $scope.data.push(_.values(p[1].software_development_rate));
                          });
-
-                     $scope.data = _.map(
-                         response.data,
-                         function(r) {
-                             return _.values(r.software_development_rate);
-                         });
-
                  }, function errorCallback(response) {
                      // TODO: on error...
                  });
 
              };
-
-             // $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-             // $scope.series = ['Series A', 'Series B'];
-             // $scope.data = [
-             //     [65, 59, 80, 81, 56, 55, 40],
-             //     [28, 48, 40, 19, 86, 27, 90]
-             // ];
-             // $scope.onClick = function (points, evt) {
-             //     console.log(points, evt);
-             // };
          }]);
 }());
