@@ -42,9 +42,19 @@
                  }).then(function successCallback(response) {
                      console.log(response);
 
-                     // TODO: How should we merge elapsed times? Should we at all? We need to pick the longest.
-                     var first_series = _.values(response.data)[0];
-                     $scope.labels = _.values(first_series.elapsed_time);
+                     var elapsed_times = _.map(
+                         _.values(response.data),
+                         function(s) { return s.elapsed_time; }
+                     );
+
+                     var longest_series = _.reduce(
+                         elapsed_times,
+                         function(accum, next){
+                             return _.size(next) > accum.length ? _.values(next) : accum;
+                         },
+                         []);
+
+                     $scope.labels = _.values(longest_series);
 
                      $scope.series = [];
                      $scope.data = [];
