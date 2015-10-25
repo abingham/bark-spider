@@ -18,7 +18,7 @@
     <body ng-app="BarkSpiderApp" ng-controller="BarkSpiderCtrl">
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <form class="form-horizontal">
                     <div ng-repeat="simulation in simulations">
                         <div class="form-group">
@@ -63,14 +63,12 @@
                     <button type="submit" class="btn btn-default" ng-click="simulate()">Simulate</button>
                 </form>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <canvas id="software-development-rate-chart" class="chart chart-line" chart-data="data"
-                        chart-labels="labels" chart-legend="true" chart-series="series"
-                        chart-click="onClick"
-                        chart-options="options">
-                </canvas>
+            <div class="col-md-8">
+              <canvas id="software-development-rate-chart" class="chart chart-line" chart-data="data"
+                      chart-labels="labels" chart-legend="true" chart-series="series"
+                      chart-click="onClick"
+                      chart-options="options">
+              </canvas>
             </div>
         </div>
     </body>
