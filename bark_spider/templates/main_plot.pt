@@ -28,30 +28,30 @@
 		    <hr>
 		    
 		    <div ng-repeat="simulation in simulations" ng-controller="ParameterSetCtrl">
-			<div class="well well-sm">
-			    <span ng-click="opened = !opened">
-				<i class="glyphicon" ng-class="{'glyphicon-chevron-down': opened, 'glyphicon-chevron-right': !opened}" ></i>
-				<a>{{simulation.name}}</a> <em ng-if="!simulation.included">excluded</em>
-			    </span>
-			    <span class="pull-right">
-				<a ng-click="simulation.included = !simulation.included">
-				    <span ng-switch="simulation.included">
-					<span ng-switch-when="true">exclude</span>
-					<span ng-switch-when="false">include</span>
-				    </span>
-				</a> |
-				<a ng-click="remove_parameter_set($index);">delete</a>
-			    </span>
+			<div class="well">
+			    <div class="input-group input-group">
+				<span class="input-group-btn">
+				    <button type="button" class="form-control btn btn-default" ng-click="opened = !opened">
+					<span class="glyphicon" ng-class="{'glyphicon-chevron-down': opened, 'glyphicon-chevron-right': !opened}"></span>
+				    </button>
+				</span>
+				<input type="text" class="form-control" ng-model="simulation.name">
+				<div class="input-group-btn">
+				    <button type="button" class="btn btn-default" ng-click="simulation.included = !simulation.included" ng-class="{'btn-info': !simulation.included}">
+					<span ng-switch="simulation.included">
+					    <span ng-switch-when="true">exclude</span>
+					    <span ng-switch-when="false">include</span>
+					</span>					
+				    </button>
+				    <button type="button" class="btn btn-default" ng-click="remove_parameter_set($index);">
+					delete
+				    </button>
+				</div>
+			    </div>
 			</div>
 			<div uib-collapse="!opened">
 
 			    <form class="form-horizontal">
-				<div class="form-group">
-			 	    <label class="col-sm-2 control-label">Name</label>
-			 	    <div class="col-sm-10">
-			 		<input class="form-control" ng-model="simulation.name"/>
-			 	    </div>
-				</div>
 				<div class="form-group">
 			 	    <label class="col-sm-2 control-label">Assimilation delay (days)</label>
 			 	    <div class="col-sm-10">
