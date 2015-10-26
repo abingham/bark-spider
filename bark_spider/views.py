@@ -9,7 +9,6 @@ from brooks.brooks_law import step
 import brooks.communication
 from brooks.simulation import simulate
 from brooks.state import State
-from plotter.plot_timeseries import plot_timeseries
 
 from .json_util import DataFrameJSONEncoder
 
