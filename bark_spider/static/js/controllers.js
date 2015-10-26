@@ -19,6 +19,7 @@
              $scope.add_parameter_set = function(name) {
                  var params = {
                      name: name,
+                     included: true,
                      assimilation_delay: 20,
                      elapsed: 100,
                      added: 20
@@ -44,7 +45,11 @@
                      method: 'POST',
                      url: '/simulate',
                      data: JSON.stringify({
-                         simulation_parameter_sets: $scope.simulations
+                         simulation_parameter_sets: _.filter(
+                             $scope.simulations,
+                             function (s) {
+                                 return s.included;
+                             })
                      }),
                      headers: {
                          'Content-Type': 'application/json'
@@ -80,5 +85,12 @@
              };
 
              initialize_params($scope);
+         }]);
+
+    barkSpiderControllers.controller(
+        'ParameterSetCtrl',
+        ['$scope',
+         function($scope) {
+             $scope.opened = false;
          }]);
 }());

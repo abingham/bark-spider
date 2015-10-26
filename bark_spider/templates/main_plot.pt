@@ -27,13 +27,19 @@
 		    <button type="button" class="btn btn-primary pull-right" ng-click="simulate()">Run simulation</button>
 		    <hr>
 		    
-		    <div ng-repeat="simulation in simulations">
+		    <div ng-repeat="simulation in simulations" ng-controller="ParameterSetCtrl">
 			<div class="well well-sm">
 			    <span ng-click="opened = !opened">
 				<i class="glyphicon" ng-class="{'glyphicon-chevron-down': opened, 'glyphicon-chevron-right': !opened}" ></i>
-				<a>{{simulation.name}}</a>
+				<a>{{simulation.name}}</a> <em ng-if="!simulation.included">excluded</em>
 			    </span>
 			    <span class="pull-right">
+				<a ng-click="simulation.included = !simulation.included">
+				    <span ng-switch="simulation.included">
+					<span ng-switch-when="true">exclude</span>
+					<span ng-switch-when="false">include</span>
+				    </span>
+				</a> |
 				<a ng-click="remove_parameter_set($index);">delete</a>
 			    </span>
 			</div>
