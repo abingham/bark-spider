@@ -31,6 +31,7 @@
 					<a role="button" data-toggle="collapse" data-parent="#simulation-parameter-accordion" href="#sim-params-{{$index}}">
 					    {{simulation.name}}
 					</a>
+					<span class="pull-right"><a ng-click="remove_parameter_set($index);">delete</a><span>
 				    </h4>
 				</div>
 				<div id="sim-params-{{$index}}" class="panel-collapse collapse" role="tabpanel">

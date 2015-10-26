@@ -28,6 +28,10 @@
                  return params;
              };
 
+             $scope.remove_parameter_set = function(index) {
+                 $scope.simulations.splice(index, 1);
+             };
+
              $scope.labels = [];
              $scope.series = [];
              $scope.data = [];
