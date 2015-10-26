@@ -50,8 +50,6 @@
                          'Content-Type': 'application/json'
                      }
                  }).then(function successCallback(response) {
-                     console.log(response);
-
                      var elapsed_times = _.map(
                          _.values(response.data),
                          function(s) { return s.elapsed_time; }
