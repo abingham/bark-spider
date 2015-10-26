@@ -11,6 +11,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-chart.js/0.8.5/angular-chart.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
 
 	<script src="static/js/app.js"></script>
 	<script src="static/js/controllers.js"></script>
@@ -21,56 +22,54 @@
 	    <div class="col-md-4">
 		<h1>Simulation parameters</h1>
 		<a ng-click="add_parameter_set('New parameter set');">Add parameter set</a>
-		<form class="form-horizontal">
-		    <div class="panel-group" id="simulation-parameter-accordion" role="tablist">
-			<div ng-repeat="simulation in simulations">
 
-			    <div class="panel panel-default">
-				<div class="panel-heading" role="tab">
-				    <h4 class="panel-title">
-					{{simulation.name}}
-					<span class="pull-right">
-					    <a role="button" data-toggle="collapse" data-parent="#simulation-parameter-accordion" href="#sim-params-{{$index}}">
-						edit
-					    </a>|
-					    <a ng-click="remove_parameter_set($index);">delete</a>
-					</span>
-				    </h4>
-				</div>
-				<div id="sim-params-{{$index}}" class="panel-collapse collapse" role="tabpanel">
-				    <div class="panel-body">
-					<div class="form-group">
-					    <label class="col-sm-2 control-label">Name</label>
-					    <div class="col-sm-10">
-						<input class="form-control" ng-model="simulation.name"/>
-					    </div>
-					</div>
-					<div class="form-group">
-					    <label class="col-sm-2 control-label">Assimilation delay (days)</label>
-					    <div class="col-sm-10">
-						<input class="form-control" type="number" min="0" value="20" ng-model="simulation.assimilation_delay"/>
-					    </div>
-					</div>
-					<div class="form-group">
-					    <label class="col-sm-2 control-label"># days elapsed</label>
-					    <div class="col-sm-10">
-						<input class="form-control" type="number" min="0" value="0" ng-model="simulation.elapsed"/>
-					    </div>
-					</div>
-					<div class="form-group">
-					    <label class="col-sm-2 control-label"># devs added</label>
-					    <div class="col-sm-10">
-						<input class="form-control" type="number" min="0" value="0" ng-model="simulation.added"/>
-					    </div>
-					</div>
-				    </div>
-				</div>
-			    </div>
-			    
-			</div>
-		    </div>
-		    <button type="submit" class="btn btn-default" ng-click="simulate()">Simulate</button>
-		</form>
+		<uib-accordion close-others="false">
+		    <div ng-repeat="simulation in simulations">
+
+			<uib-accordion-group>
+			    <uib-accordion-heading>
+				{{simulation.name}}
+				<span class="pull-right">
+			 	    <a role="button">
+			 		edit
+			 	    </a>|
+			 	    <a ng-click="remove_parameter_set($index);">delete</a>
+			 	</span>
+			    </uib-accordion-heading>
+
+			    <form class="form-horizontal">
+			 	<div class="form-group">
+			 	    <label class="col-sm-2 control-label">Name</label>
+			 	    <div class="col-sm-10">
+			 		<input class="form-control" ng-model="simulation.name"/>
+			 	    </div>
+			 	</div>
+			 	<div class="form-group">
+			 	    <label class="col-sm-2 control-label">Assimilation delay (days)</label>
+			 	    <div class="col-sm-10">
+			 		<input class="form-control" type="number" min="0" value="20" ng-model="simulation.assimilation_delay"/>
+			 	    </div>
+			 	</div>
+			 	<div class="form-group">
+			 	    <label class="col-sm-2 control-label"># days elapsed</label>
+			 	    <div class="col-sm-10">
+			 		<input class="form-control" type="number" min="0" value="0" ng-model="simulation.elapsed"/>
+			 	    </div>
+			 	</div>
+			 	<div class="form-group">
+			 	    <label class="col-sm-2 control-label"># devs added</label>
+			 	    <div class="col-sm-10">
+			 		<input class="form-control" type="number" min="0" value="0" ng-model="simulation.added"/>
+			 	    </div>
+			 	</div>
+			    </form>
+
+			</uib-accordion-group>
+
+		    </div> <!-- repeat -->
+
+		</uib-accordion>
+		<button class="btn btn-default" ng-click="simulate()">Simulate</button>
 	    </div>
 	    <div class="col-md-8">
 		<canvas id="software-development-rate-chart" class="chart chart-line" chart-data="data"

@@ -5,6 +5,7 @@
         'BarkSpiderApp',
         [
             'barkSpiderControllers',
-            'chart.js'
+            'chart.js',
+            'ui.bootstrap'
         ]);
 }());
