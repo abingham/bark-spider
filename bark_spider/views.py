@@ -23,8 +23,6 @@ def _run_simulation(params):
     output_stream = StringIO()
     schedule = make_schedule(**params)
 
-    print(schedule._state)
-
     simulate(schedule, step, output_stream, attributes)
     output_stream.seek(0)
 
