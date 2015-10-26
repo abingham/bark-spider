@@ -20,6 +20,7 @@
 	<div class="row">
 	    <div class="col-md-4">
 		<h1>Simulation parameters</h1>
+		<a ng-click="add_parameter_set('New parameter set');">Add parameter set</a>
 		<form class="form-horizontal">
 		    <div class="panel-group" id="simulation-parameter-accordion" role="tablist">
 			<div ng-repeat="simulation in simulations">

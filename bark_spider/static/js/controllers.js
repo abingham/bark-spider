@@ -3,24 +3,30 @@
 
     var barkSpiderControllers = angular.module('barkSpiderControllers', []);
 
+    var initialize_params = function($scope) {
+        var params = $scope.add_parameter_set('+10 @ 100d');
+        params.assimilation_delay = 20;
+        params.elapsed = 100;
+        params.added = 10;
+    };
+
     barkSpiderControllers.controller(
         'BarkSpiderCtrl',
         ['$scope', '$http',
          function($scope, $http) {
              $scope.simulations = [];
-             $scope.simulations.push({
-                 name: '+10 @ 100d',
-                 assimilation_delay: 20,
-                 elapsed: 100,
-                 added: 10
-             });
 
-             $scope.simulations.push({
-                 name: '+20 @ 100d',
-                 assimilation_delay: 20,
-                 elapsed: 100,
-                 added: 20
-             });
+             $scope.add_parameter_set = function(name) {
+                 var params = {
+                     name: name,
+                     assimilation_delay: 20,
+                     elapsed: 100,
+                     added: 20
+                 };
+
+                 $scope.simulations = $scope.simulations.concat(params);
+                 return params;
+             };
 
              $scope.labels = [];
              $scope.series = [];
@@ -70,5 +76,7 @@
                  });
 
              };
+
+             initialize_params($scope);
          }]);
 }());
