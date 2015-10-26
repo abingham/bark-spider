@@ -26,13 +26,11 @@
 		<uib-accordion close-others="false">
 		    <div ng-repeat="simulation in simulations">
 
-			<uib-accordion-group>
+			<uib-accordion-group is-open="opened">
 			    <uib-accordion-heading>
-				{{simulation.name}}
+				<i class="glyphicon" ng-class="{'glyphicon-chevron-down': opened, 'glyphicon-chevron-right': !opened}"></i>
+				    {{simulation.name}}
 				<span class="pull-right">
-			 	    <a role="button">
-			 		edit
-			 	    </a>|
 			 	    <a ng-click="remove_parameter_set($index);">delete</a>
 			 	</span>
 			    </uib-accordion-heading>
