@@ -33,7 +33,11 @@ class Schedule:
         return state
 
 
-def make_schedule(assimilation_delay, elapsed, added):
+def make_schedule(assimilation_delay,
+                  training_overhead_proportion,
+                  elapsed,
+                  added,
+                  **kwargs):
     """Create a new State object.
 
     Args:
@@ -54,7 +58,7 @@ def make_schedule(assimilation_delay, elapsed, added):
         nominal_productivity=0.1,
         new_productivity_weight=0.8,
         experienced_productivity_weight=1.2,
-        training_overhead_proportion=0.25,
+        training_overhead_proportion=training_overhead_proportion,
         communication_overhead_function=gompertz_overhead_proportion,
         software_development_rate=None,
         cumulative_person_days=0,

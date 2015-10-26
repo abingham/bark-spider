@@ -19,12 +19,12 @@ def main_plot(request):
 
 def _run_simulation(params):
     attributes = ['software_development_rate']
-    elapsed = params['elapsed']
-    added = params['added']
-    assimilation_delay = params['assimilation_delay']
 
     output_stream = StringIO()
-    schedule = make_schedule(assimilation_delay, elapsed, added)
+    schedule = make_schedule(**params)
+
+    print(schedule._state)
+
     simulate(schedule, step, output_stream, attributes)
     output_stream.seek(0)
 
