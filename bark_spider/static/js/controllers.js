@@ -7,9 +7,8 @@
     var initialize_params = function($scope) {
         var params = $scope.add_parameter_set('+10 @ 100d');
         params.assimilation_delay = 20;
-        params.training_overhead_proportion = 0.25,
-        params.elapsed = 100;
-        params.added = 10;
+        params.training_overhead_proportion = 0.25;
+        params.interventions = 'add 100 10';
     };
 
     barkSpiderControllers.controller(
@@ -25,8 +24,7 @@
                      included: true,
                      assimilation_delay: 20,
                      training_overhead_proportion: 0.25,
-                     elapsed: 100,
-                     added: 20
+                     interventions: ''
                  };
 
                  $scope.simulations = $scope.simulations.concat(params);

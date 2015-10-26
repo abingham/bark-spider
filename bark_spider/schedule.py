@@ -5,10 +5,9 @@ from brooks.communication import (
 
 
 class Schedule:
-    def __init__(self, state, elapsed, added):
+    def __init__(self, state, interventions):
         self._state = state
-        self._elapsed = elapsed
-        self._added = added
+        self._interventions = sorted(interventions, key=lambda i: i.time)
 
     def initial(self):
         """Configure the initial model state."""
@@ -18,8 +17,11 @@ class Schedule:
         """Intervene in the current step before the main simulation step is
         executed.
         """
-        if elapsed_time == self._elapsed:
-            state.num_new_personnel += self._added
+        while (self._interventions and
+               self._interventions[0].time <= elapsed_time):
+            state = self._interventions[0].apply(state)
+            self._interventions = self._interventions[1:]
+
         return state
 
     def is_complete(self, step_number, elapsed_time_seconds, state):
@@ -33,10 +35,56 @@ class Schedule:
         return state
 
 
+class Intervention:
+    def __init__(self, time):
+        self._time = time
+
+    @property
+    def time(self):
+        "The elapsed time at which the intervention takes place."
+        return self._time
+
+    def apply(self, state):
+        raise NotImplementedError('_apply() not implemented')
+
+
+class AddDevelopers(Intervention):
+    def __init__(self, time, num_developers):
+        super().__init__(time)
+        self._num_developers = num_developers
+
+    @property
+    def num_developers(self):
+        "The number of developers to add."
+        return self._num_developers
+
+    def apply(self, state):
+        state.num_new_personnel += self.num_developers
+        return state
+
+
+def _parse_intervention(line):
+    (command, time, *args) = line.split()
+    command = command.lower()
+
+    if command == 'add':
+        return AddDevelopers(int(time), int(args[0]))
+
+    raise ValueError(
+        'Unknown command {} while parsing interventions. '
+        '(full command={})'.format(
+            command, line))
+
+
+def _parse_interventions(text):
+    return (_parse_intervention(line)
+            for line in map(str.strip, text.split('\n'))
+            if line)
+
+
 def make_schedule(assimilation_delay,
                   training_overhead_proportion,
-                  elapsed,
-                  added,
+                  interventions,
                   **kwargs):
     """Create a new State object.
 
@@ -64,4 +112,4 @@ def make_schedule(assimilation_delay,
         cumulative_person_days=0,
     )
 
-    return Schedule(state, elapsed, added)
+    return Schedule(state, _parse_interventions(interventions))
