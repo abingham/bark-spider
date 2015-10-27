@@ -16,26 +16,25 @@ module.exports = function() {
     var page,
         startParamCount;
 
-    this.Given(/^I go to the front page$/, function(next) {
+    this.Given(/^I go to the front page$/, function() {
         page = new MainPage();
-        page.get().then(next);
+        return page.get();
     });
 
-    this.Then(/^there should be (\d+) parameter sets?$/, function(expected_count, next) {
+    this.Then(/^there should be (\d+) parameter sets?$/, function(expected_count) {
         var expected_count = Number(expected_count);
-        page.paramCount().then(
+        return page.paramCount().then(
             function(c) {
                 expect(c).to.equal(expected_count);
-                next();
             });
     });
 
-    this.When(/^I add a parameter set$/, function (next) {
-        page.addParameter().then(next);
+    this.When(/^I add a parameter set$/, function () {
+        return page.addParameter();
     });
 
-    this.When(/^I delete a parameter set$/, function (next) {
-        page.deleteParameter(0).then(next);
+    this.When(/^I delete a parameter set$/, function () {
+        return page.deleteParameter(0);
     });
 
 };
