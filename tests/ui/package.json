@@ -1,0 +1,13 @@
+{
+    "name": "bark-spider-ui-tests",
+    "private": false,
+    "version": "0.0.0",
+    "description": "Cucumber-protractor UI tests for bark-spider.",
+    "repository": "http://github.com/sixty-north/bark-spider",
+    "license": "AGPL",
+    "dependencies": {
+        "angular": "1.3.x",
+        "chai": "2.1.x",
+        "chai-as-promised": "2.1.x"
+    }
+}

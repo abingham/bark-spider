@@ -16,7 +16,7 @@
 	<script src="static/js/app.js"></script>
 	<script src="static/js/controllers.js"></script>
     </head>
-    <body ng-app="BarkSpiderApp" ng-controller="BarkSpiderCtrl">
+    <body id="bark-spider-app" ng-app="BarkSpiderApp" ng-controller="BarkSpiderCtrl">
 
 	<div class="container-fluid">
 	    <div class="row">
