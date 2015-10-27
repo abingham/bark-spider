@@ -20,12 +20,13 @@ module.exports = function() {
         next();
     });
 
-    this.Then(/^there should be (\d+) parameter set$/, function(param_set_count, next) {
-        this.browser.findElements(this.by.repeater('simulation in simulations')).then(function(result) {
+    this.Then(/^there should be (\d+) parameter set$/, function(expected_count, next) {
+        expected_count = Number(expected_count);
+        var blocks = element.all(by.repeater('simulation in simulations'));
+        blocks.count().then(function(count) {
+            expect(count).to.equal(expected_count);
+            next();
         });
-        //var paramBlocks = element.all(by.repeater('simulation in simulations'));
-        //expect(paramBlocks.count()).to.equal(param_set_count);
-        next();
     });
 
     // this.Then(/the name label says "Hello ([^"]*)"$/, function(text, next) {

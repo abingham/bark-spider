@@ -15,7 +15,7 @@ exports.config = {
 
   baseUrl: env.baseUrl,
 
-  rootElement: '.bark-spider-app',
+  // rootElement: '.bark-spider-app',
 
   cucumberOpts: {
     require: 'cucumber/stepDefinitions.js',
