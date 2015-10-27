@@ -16,3 +16,15 @@ Feature: Simulation parameter sets
     Given I go to the front page
     And I delete a parameter set
     Then there should be 0 parameter sets
+
+  Scenario: Unhide parameter set
+    Given I go to the front page
+    Then parameter set 0 is hidden
+    When I unhide parameter set 0
+    Then parameter set 0 is visible
+
+  Scenario: Hide parameter set
+    Given I go to the front page
+    And I unhide parameter set 0
+    When I hide parameter set 0
+    Then parameter set 0 is hidden

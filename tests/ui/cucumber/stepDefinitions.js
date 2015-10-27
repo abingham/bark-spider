@@ -37,4 +37,14 @@ module.exports = function() {
         return page.deleteParameter(0);
     });
 
+    this.Then(/^parameter set (\d+) is (hidden|visible)$/, function (index, state) {
+        return page.parametersVisible(index).then(
+            function(visible) {
+                expect(visible).to.equal(state == 'visible' ? true : false);
+            });
+    });
+
+    this.When(/^I (unhide|hide) parameter set (\d+)$/, function (state, index) {
+        return page.showParameters(index, state == 'unhide' ? true : false);
+    });
 };

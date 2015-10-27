@@ -31,7 +31,7 @@
 			<div class="well">
 			    <div class="input-group input-group">
 				<span class="input-group-btn">
-				    <button type="button" class="form-control btn btn-default" ng-click="opened = !opened">
+				    <button type="button" class="hide-show-parameters form-control btn btn-default" ng-click="opened = !opened">
 					<span class="glyphicon" ng-class="{'glyphicon-chevron-down': opened, 'glyphicon-chevron-right': !opened}"></span>
 				    </button>
 				</span>
@@ -50,7 +50,7 @@
 			    </div>
 			</div>
 			<div uib-collapse="!opened">
-			    <form class="form-horizontal">
+			    <form class="form-horizontal parameter-set-form">
 				<div class="form-group">
 			 	    <label class="col-sm-2 control-label">Assimilation delay (days)</label>
 			 	    <div class="col-sm-10">
