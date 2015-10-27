@@ -1,9 +1,19 @@
+"""Utilities for handling our special JSON needs.
+"""
+
 import json
 
 import pandas
 
 
 class DataFrameJSONEncoder(json.JSONEncoder):
+    """A JSON encoder that knows how to encode pandas DataFrames.
+
+    To use this, pass it as the `cls` argument to `json.dumps`:
+
+        obj = . . . some structure with a DataFrame in it . . .
+        encoded_obj = json.dumps(obj, cls=DataFrameJSONEncoder)
+    """
     @staticmethod
     def string_keys(d):
         "Covert all keys to strings in a dict."
