@@ -9,24 +9,25 @@ var expect = chai.expect;
 // Chai expect().to.exist syntax makes default jshint unhappy.
 // jshint expr:true
 
+var MainPage = require('./main_page.js');
+
 module.exports = function() {
 
-    // this.Given(/^I go to(?: the website)? "([^"]*)"$/, function(url, next) {
-    //     browser.get(url);
-    //     next();
-    // });
+    var page,
+        startParamCount;
+
     this.Given(/^I go to the front page$/, function(next) {
-        browser.get('http://localhost:6543');
-        next();
+        page = new MainPage();
+        page.get().then(next);
     });
 
     this.Then(/^there should be (\d+) parameter set$/, function(expected_count, next) {
-        expected_count = Number(expected_count);
-        var blocks = element.all(by.repeater('simulation in simulations'));
-        blocks.count().then(function(count) {
-            expect(count).to.equal(expected_count);
-            next();
-        });
+        var expected_count = Number(expected_count);
+        page.paramCount().then(
+            function(c) {
+                expect(c).to.equal(expected_count);
+                next();
+            });
     });
 
     // this.Then(/the name label says "Hello ([^"]*)"$/, function(text, next) {
