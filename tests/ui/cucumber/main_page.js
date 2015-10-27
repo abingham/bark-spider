@@ -2,7 +2,10 @@
 
 var MainPage = function() {
     var url = 'http://localhost:6543',
-        paramBlocks = element.all(by.repeater('simulation in simulations'));
+        paramBlocks = element.all(by.repeater('simulation in simulations')),
+        addParameterButton = element(by.id('add-parameters-btn')),
+        deleteButtons = element.all(by.buttonText('delete'))
+    ;
 
     this.get = function() {
         return browser.get(url);
@@ -10,6 +13,14 @@ var MainPage = function() {
 
     this.paramCount = function () {
         return paramBlocks.count();
+    };
+
+    this.addParameter = function () {
+        return addParameterButton.click();
+    };
+
+    this.deleteParameter = function(index) {
+        return deleteButtons.get(index).click();
     };
 };
 

@@ -3,13 +3,16 @@ Feature: Simulation parameter sets
   I should be able to create, edit, and delete parameter sets
   in order to configure the simulations I need.
 
-  @dev
-  Scenario: A preconfigure param set is provided
+  Scenario: A preconfigured param set is provided
     Given I go to the front page
     Then there should be 1 parameter set
 
-  # @dev
-  # Scenario: Create new parameter set
-  #   Given I go to the front page 	    	
-  #   And I click "Add parameter set"
-  #   Then there should be 2 parameter sets
+  Scenario: Create new parameter set
+    Given I go to the front page 	    	
+    And I add a parameter set
+    Then there should be 2 parameter sets
+
+  Scenario: Delete parameter set
+    Given I go to the front page
+    And I delete a parameter set
+    Then there should be 0 parameter sets

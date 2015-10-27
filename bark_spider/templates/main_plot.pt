@@ -23,7 +23,7 @@
 		<div class="col-md-4">
 		    <h1>Simulation parameters</h1>
 
-		    <button type="button" class="btn btn-default" ng-click="add_parameter_set('New parameter set');">Add parameter set</button>
+		    <button id="add-parameters-btn" type="button" class="btn btn-default" ng-click="add_parameter_set('New parameter set');">Add parameter set</button>
 		    <button type="button" class="btn btn-primary pull-right" ng-click="simulate()">Run simulation</button>
 		    <hr>
 

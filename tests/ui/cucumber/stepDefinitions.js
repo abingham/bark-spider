@@ -21,7 +21,7 @@ module.exports = function() {
         page.get().then(next);
     });
 
-    this.Then(/^there should be (\d+) parameter set$/, function(expected_count, next) {
+    this.Then(/^there should be (\d+) parameter sets?$/, function(expected_count, next) {
         var expected_count = Number(expected_count);
         page.paramCount().then(
             function(c) {
@@ -30,25 +30,12 @@ module.exports = function() {
             });
     });
 
-    // this.Then(/the name label says "Hello ([^"]*)"$/, function(text, next) {
-    //     var label = element(by.id("hello-label"));
-    //     label.getText().then(function(r) {
-    //         expect(r).to.equal("Hello " + text);
-    //         next();
-    //     });
-    // });
+    this.When(/^I add a parameter set$/, function (next) {
+        page.addParameter().then(next);
+    });
 
-    // this.Then(/^it should expose the correct global variables$/, function(next) {
-    //     expect(protractor).to.exist;
-    //     expect(browser).to.exist;
-    //     expect(by).to.exist;
-    //     expect(element).to.exist;
-    //     expect($).to.exist;
-    //     next();
-    // });
-
-    // this.Then(/the title should equal "([^"]*)"$/, function(text, next) {
-    //     expect(browser.getTitle()).to.eventually.equal(text).and.notify(next);
-    // });
+    this.When(/^I delete a parameter set$/, function (next) {
+        page.deleteParameter(0).then(next);
+    });
 
 };

@@ -2,24 +2,24 @@ var env = require('./environment.js');
 
 // A small suite to make sure the cucumber framework works.
 exports.config = {
-  seleniumAddress: env.seleniumAddress,
+    seleniumAddress: env.seleniumAddress,
 
-  framework: 'cucumber',
+    framework: 'cucumber',
 
-  // Spec patterns are relative to this directory.
-  specs: [
-    'cucumber/*.feature'
-  ],
+    // Spec patterns are relative to this directory.
+    specs: [
+        'cucumber/*.feature'
+    ],
 
-  capabilities: env.capabilities,
+    capabilities: env.capabilities,
 
-  baseUrl: env.baseUrl,
+    baseUrl: env.baseUrl,
 
-  // rootElement: '.bark-spider-app',
+    // rootElement: '.bark-spider-app',
 
-  cucumberOpts: {
-    require: 'cucumber/stepDefinitions.js',
-    tags: '@dev',
-    format: 'pretty'
-  }
+    cucumberOpts: {
+        require: 'cucumber/stepDefinitions.js',
+        // tags: '@dev',
+        format: 'pretty'
+    }
 };
