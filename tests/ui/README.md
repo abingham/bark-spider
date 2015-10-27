@@ -6,7 +6,7 @@ Cucumber-protractor UI tests for bark-spider.
 First you need to install protractor, cucumber, and the other dependencies:
 
   npm install -g protractor cucumber
-  npm install 
+  npm install angular chai chai-as-promised
 
 (This assumes you've already installed node, npm, etc.)
 
