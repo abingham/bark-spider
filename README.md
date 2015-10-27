@@ -11,3 +11,11 @@ A web interface for Sixty North's software process simulation tools.
    software processes.
 
 Use virtual environments as you see fit.
+
+## Testing
+
+To run the JSON API approval tests:
+
+    python -m unittest bark_spider.tests
+
+More tests coming soon...

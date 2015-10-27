@@ -42,6 +42,7 @@ class Schedule:
 def make_schedule(assimilation_delay,
                   training_overhead_proportion,
                   interventions,
+                  num_function_points_requirements=500,
                   **kwargs):
     """Create a new State object.
 
@@ -53,7 +54,7 @@ def make_schedule(assimilation_delay,
     """
     state = State(
         step_duration_days=1,
-        num_function_points_requirements=500,
+        num_function_points_requirements=num_function_points_requirements,
         num_function_points_developed=0,
         num_new_personnel=20,
         num_experienced_personnel=0,
