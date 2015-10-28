@@ -39,60 +39,89 @@
              $scope.labels = [];
              $scope.series = [];
              $scope.data = [];
+
              $scope.options = {
                  pointDot: false
              };
 
              // Run a simulation using the currently configured parameter sets
              $scope.simulate = function() {
-                 $http({
-                     method: 'POST',
-                     url: '/simulate',
-                     data: JSON.stringify({
-                         // Filter out the parameter sets which have
-                         // been excluded.
-                         simulation_parameter_sets: _.filter(
-                             $scope.simulations,
-                             function (s) {
-                                 return s.included;
-                             })
-                     }),
-                     headers: {
-                         'Content-Type': 'application/json'
-                     }
-                 }).then(function successCallback(response) {
-                     // Get all of the elapsed times from the response
-                     var elapsed_times = _.map(
-                         _.values(response.data),
-                         function(s) { return s.elapsed_time; }
-                     );
+                 var included_params = _.filter(
+                     $scope.simulations,
+                     function (s) {
+                         return s.included;
+                     });
 
-                     // Find the longest set of elapsed times. This
-                     // will define how large the plot needs to be.
-                     var longest_series = _.reduce(
-                         elapsed_times,
-                         function(accum, next){
-                             return _.size(next) > accum.length ? _.values(next) : accum;
-                         },
-                         []);
+                 $scope.labels = [];
+                 $scope.series = [];
+                 $scope.data = [];
 
-                     $scope.labels = _.values(longest_series);
+                 // TODO: Should we wait for all results to arrive,
+                 // construct final plotting variables, and then
+                 // update the $scope variables then? That might
+                 // improve performance. As it is, we might be causing
+                 // angular and/or the renderer to flail.
 
-                     $scope.series = [];
-                     $scope.data = [];
+                 var requests = _.map(
+                     included_params,
+                     function (p) {
+                         $http({
+                             method: 'POST',
+                             url: '/simulate',
+                             data: JSON.stringify(p),
+                             headers: {
+                                 'Content-Type': 'application/json'
+                             }
+                         }).then(function(response) {
+                             $http({
+                                 method: 'GET',
+                                 url: response.data.url
+                             }).then(function(response) {
+                                 var results = response.data.results;
+                                 var parameters = response.data.parameters;
 
-                     // Collect the series names and rate values from
-                     // the response.
-                     _.map(
-                         _.pairs(response.data),
-                         function (p) {
-                             $scope.series.push(p[0]);
-                             $scope.data.push(_.values(p[1].software_development_rate));
+                                 // Only update labels if we have more data points
+                                 var elapsed_time = results.elapsed_time;
+                                 if (_.size(elapsed_time) > $scope.labels.length) {
+                                     $scope.labels = _.values(elapsed_time);
+                                 }
+
+                                 $scope.series.push(parameters.name);
+                                 $scope.data.push(_.values(results.software_development_rate));
+                             });
                          });
-                 }, function errorCallback(response) {
-                     // TODO: on error...
-                 });
+                     });
 
+                 // $q.all(requests).then(function(responses) {
+                 //     // Get all of the elapsed times from the response
+                 //     var elapsed_times = _.map(
+                 //         responses,
+                 //         function(s) { return s.elapsed_time; }
+                 //     );
+
+                 //     // Find the longest set of elapsed times. This
+                 //     // will define how large the plot needs to be.
+                 //     var longest_series = _.reduce(
+                 //         elapsed_times,
+                 //         function(accum, next){
+                 //             return _.size(next) > accum.length ? _.values(next) : accum;
+                 //         },
+                 //         []);
+
+                 //     $scope.labels = _.values(longest_series);
+
+                 //     $scope.series = [];
+                 //     $scope.data = [];
+
+                 //     // Collect the series names and rate values from
+                 //     // the response.
+                 //     _.map(
+                 //         _.pairs(response.data),
+                 //         function (p) {
+                 //             $scope.series.push(p[0]);
+                 //             $scope.data.push(_.values(p[1].software_development_rate));
+                 //         });
+                 // });
              };
 
              // Create a starter parameter set.
