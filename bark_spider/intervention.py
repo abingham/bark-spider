@@ -44,7 +44,12 @@ def _parse_intervention(line):
             '(full command={})'.format(
                 command, line))
 
-    return cls.make_instance(int(time), *args)
+    try:
+        return cls.make_instance(int(time), *args)
+    except Exception as e:
+        raise ValueError(
+            'Invalid command while parsing intervention: {}'.format(
+                line)) from e
 
 
 def parse_interventions(stream):
