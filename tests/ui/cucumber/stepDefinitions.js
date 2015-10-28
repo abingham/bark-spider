@@ -48,11 +48,13 @@ module.exports = function() {
         return page.showParameters(index, state == 'unhide' ? true : false);
     });
 
-    this.When(/^I exclude parameter set (\d+)$/, function() {
-        return page.includeParameters(0, false);
+    this.When(/^I (include|exclude) parameter set (\d+)$/, function(state, index) {
+        return page.includeParameters(index, state == 'include');
     });
 
-    this.When(/^parameter set (\d+) is excluded$/, function() {
-        return page.includeParameters(0, false);
+    this.When(/^parameter set (\d+) is marked as (included|excluded)$/, function(index, state) {
+        var included = page.parametersIncluded(index);
+        var expected = state == 'included';
+        return included == expected;
     });
 };
