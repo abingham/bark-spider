@@ -28,3 +28,9 @@ Feature: Simulation parameter sets
     And I unhide parameter set 0
     When I hide parameter set 0
     Then parameter set 0 is hidden
+
+  @dev
+  Scenario: Excluding a parameter set changes button to "include"
+    Given I go to the front page
+    When I exclude parameter set 0
+    Then parameter set 0 is excluded

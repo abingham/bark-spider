@@ -47,4 +47,12 @@ module.exports = function() {
     this.When(/^I (unhide|hide) parameter set (\d+)$/, function (state, index) {
         return page.showParameters(index, state == 'unhide' ? true : false);
     });
+
+    this.When(/^I exclude parameter set (\d+)$/, function() {
+        return page.includeParameters(0, false);
+    });
+
+    this.When(/^parameter set (\d+) is excluded$/, function() {
+        return page.includeParameters(0, false);
+    });
 };

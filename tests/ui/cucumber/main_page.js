@@ -6,7 +6,8 @@ var MainPage = function() {
         addParameterButton = element(by.id('add-parameters-btn')),
         deleteButtons = element.all(by.buttonText('delete')),
         parameterForms = element.all(by.className('parameter-set-form')),
-        visibilityButtons = element.all(by.className('hide-show-parameters'))
+        visibilityButtons = element.all(by.className('hide-show-parameters')),
+        inclusionButtons = element.all(by.className('include-exclude-parameters'))
     ;
 
     this.get = function() {
@@ -36,6 +37,19 @@ var MainPage = function() {
 
     this.parametersVisible = function(index) {
         return parameterForms.get(index).isDisplayed();
+    };
+
+    this.includeParameters = function(index, include) {
+        var button = inclusionButtons.get(index);
+        if (this.parametersIncluded(index) != include) {
+            return button.click();
+        }
+        return button;
+    };
+
+    this.parametersIncluded = function(index) {
+        var button = inclusionButtons.get(index);
+        return button.evaluate('simulation.included');
     };
 };
 

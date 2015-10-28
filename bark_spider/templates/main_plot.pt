@@ -37,7 +37,7 @@
 				</span>
 				<input type="text" class="form-control" ng-model="simulation.name">
 				<div class="input-group-btn">
-				    <button type="button" class="btn btn-default" ng-click="simulation.included = !simulation.included" ng-class="{'btn-info': !simulation.included}">
+				    <button type="button" class="btn btn-default include-exclude-parameters" ng-click="simulation.included = !simulation.included" ng-class="{'btn-info': !simulation.included}">
 					<span ng-switch="simulation.included">
 					    <span ng-switch-when="true">exclude</span>
 					    <span ng-switch-when="false">include</span>
