@@ -41,9 +41,6 @@ setup(name='bark_spider',
       entry_points={
           'paste.app_factory': {
               'main = bark_spider:main'
-          },
-          'bark_spider.interventions': [
-              'add_developers = bark_spider.interventions.interventions:AddDevelopers',
-          ]
+          }
       }
 )
