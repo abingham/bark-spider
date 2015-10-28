@@ -32,6 +32,6 @@ def run_simulation(params):
     frame = pandas.read_table(output_stream)
 
     # This cleans up the null initial rate
-    frame['software_development_rate'][0] = 0
+    frame.ix[0, 'software_development_rate'] = 0
 
     return frame
