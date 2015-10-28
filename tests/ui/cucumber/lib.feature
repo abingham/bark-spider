@@ -29,13 +29,11 @@ Feature: Simulation parameter sets
     When I hide parameter set 0
     Then parameter set 0 is hidden
 
-  @dev
   Scenario: Excluding a parameter set marks it as excluded
     Given I go to the front page
     When I exclude parameter set 0
     Then parameter set 0 is marked as excluded
 
-  @dev
   Scenario: Including a parameter set marks it as included
     Given I go to the front page
     When I exclude parameter set 0
