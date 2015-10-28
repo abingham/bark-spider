@@ -3,7 +3,7 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.txt')) as f:
+with open(os.path.join(here, 'README.md')) as f:
     README = f.read()
 with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
@@ -14,6 +14,7 @@ requires = [
     'pyramid',
     'pyramid_chameleon',
     'pyramid_debugtoolbar',
+    'stevedore',
     'waitress',
     ]
 
@@ -37,8 +38,12 @@ setup(name='bark_spider',
       install_requires=requires,
       tests_require=requires,
       test_suite="bark_spider",
-      entry_points="""\
-      [paste.app_factory]
-      main = bark_spider:main
-      """,
-      )
+      entry_points={
+          'paste.app_factory': {
+              'main = bark_spider:main'
+          },
+          'bark_spider.interventions': [
+              'add_developers = bark_spider.interventions.interventions:AddDevelopers',
+          ]
+      }
+)

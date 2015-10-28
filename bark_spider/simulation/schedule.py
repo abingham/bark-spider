@@ -5,7 +5,7 @@ from brooks.communication import (
     gompertz_overhead_proportion,
 )
 
-from .interventions import parse_interventions
+from ..interventions.parse import parse_interventions
 
 
 class Schedule:
