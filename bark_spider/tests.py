@@ -16,6 +16,9 @@ import unittest
 
 from pyramid import testing
 
+from .simulation_db import SimulationDatabase
+
+
 TEST_DATA = [
     ({'name': 'test params',
       'parameters': {
@@ -67,21 +70,28 @@ class SimulateRouteTests(unittest.TestCase):
         # We need this so that route_url() will work in simulate_route()
         self.config.add_route('simulation', '/simulation/{id}')
 
+        self._db = SimulationDatabase()
+
     def tearDown(self):
         testing.tearDown()
+
+    def make_request(self):
+        req = testing.DummyRequest()
+        req.db = self._db
+        return req
 
     def test_simulate_route(self):
         from .views import simulate_route, simulation_route
 
         for req_data, expected in TEST_DATA:
             # First request the results URL
-            request = testing.DummyRequest()
+            request = self.make_request()
             request.json_body = req_data
             response = simulate_route(request)
             result_id = response['result-id']
 
             # now request the result
-            request = testing.DummyRequest()
+            request = self.make_request()
             request.matchdict['id'] = result_id
             response = simulation_route(request)
 
