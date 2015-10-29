@@ -5,10 +5,10 @@
 
     // Creates a single sample parameter set
     var initialize_params = function($scope) {
-        var params = $scope.add_parameter_set('+10 @ 100d');
-        params.assimilation_delay = 20;
-        params.training_overhead_proportion = 0.25;
-        params.interventions = 'add 100 10';
+        var sim = $scope.add_simulation('+10 @ 100d');
+        sim.parameters.assimilation_delay = 20;
+        sim.parameters.training_overhead_proportion = 0.25;
+        sim.parameters.interventions = 'add 100 10';
     };
 
     barkSpiderControllers.controller(
@@ -18,17 +18,19 @@
              $scope.simulations = [];
 
              // Create a new parameter set and append it to the list.
-             $scope.add_parameter_set = function(name) {
-                 var params = {
+             $scope.add_simulation = function(name) {
+                 var sim = {
                      name: name,
                      included: true,
-                     assimilation_delay: 20,
-                     training_overhead_proportion: 0.25,
-                     interventions: ''
+                     parameters: {
+                         assimilation_delay: 20,
+                         training_overhead_proportion: 0.25,
+                         interventions: ''
+                     }
                  };
 
-                 $scope.simulations = $scope.simulations.concat(params);
-                 return params;
+                 $scope.simulations = $scope.simulations.concat(sim);
+                 return sim;
              };
 
              // Remove the parameter set at INDEX
@@ -77,6 +79,7 @@
                                  method: 'GET',
                                  url: response.data.url
                              }).then(function(response) {
+                                 var name = response.data.name;
                                  var results = response.data.results;
                                  var parameters = response.data.parameters;
 
@@ -86,7 +89,7 @@
                                      $scope.labels = _.values(elapsed_time);
                                  }
 
-                                 $scope.series.push(parameters.name);
+                                 $scope.series.push(name);
                                  $scope.data.push(_.values(results.software_development_rate));
                              });
                          });

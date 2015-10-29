@@ -23,7 +23,7 @@
 		<div class="col-md-4">
 		    <h1>Simulation parameters</h1>
 
-		    <button id="add-parameters-btn" type="button" class="btn btn-default" ng-click="add_parameter_set('New parameter set');">Add parameter set</button>
+		    <button id="add-parameters-btn" type="button" class="btn btn-default" ng-click="add_simulation('New parameter set');">Add parameter set</button>
 		    <button type="button" class="btn btn-primary pull-right" ng-click="simulate()">Run simulation</button>
 		    <hr>
 
@@ -54,19 +54,19 @@
 				<div class="form-group">
 			 	    <label class="col-sm-2 control-label">Assimilation delay (days)</label>
 			 	    <div class="col-sm-10">
-			 		<input class="form-control" type="number" min="0" value="20" ng-model="simulation.assimilation_delay"/>
+			 		<input class="form-control" type="number" min="0" value="20" ng-model="simulation.parameters.assimilation_delay"/>
 			 	    </div>
 				</div>
                                 <div class="form-group">
 			 	    <label class="col-sm-2 control-label">Training overhead (0-1)</label>
 			 	    <div class="col-sm-10">
-			 		<input class="form-control" type="number" min="0" value="1" ng-model="simulation.training_overhead_proportion"/>
+			 		<input class="form-control" type="number" min="0" value="1" ng-model="simulation.parameters.training_overhead_proportion"/>
 			 	    </div>
 				</div>
 				<div class="form-group">
 			 	    <label class="col-sm-2 control-label">Interventions</label>
 			 	    <div class="col-sm-10">
-			 	        <textarea class="form-control" ng-model="simulation.interventions"></textarea>
+			 	        <textarea class="form-control" ng-model="simulation.parameters.interventions"></textarea>
 			 	    </div>
 				</div>
 			    </form>
