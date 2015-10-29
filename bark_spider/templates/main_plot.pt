@@ -28,7 +28,7 @@
 		    <hr>
 
 		    <div ng-repeat="simulation in simulations" ng-controller="ParameterSetCtrl">
-			<div class="well">
+			<div>
 			    <div class="input-group input-group">
 				<span class="input-group-btn">
 				    <button type="button" class="hide-show-parameters form-control btn btn-default" ng-click="opened = !opened">
