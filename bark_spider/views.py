@@ -1,4 +1,5 @@
 import json
+import multiprocessing.pool
 
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -6,6 +7,21 @@ from pyramid.view import view_config
 
 from .json_util import DataFrameJSONEncoder
 from .simulation.simulation import run_simulation
+
+_sim_pool = multiprocessing.pool.Pool()
+
+def _async_simulation(params, timeout=5):
+    """Run a simulation asynchronously.
+
+    Times out after `timeout` seconds, throwing a
+    multiprocessing.TimeoutError if so.
+
+    Returns a pandas DataFrame.
+    """
+    result = _sim_pool.apply_async(
+        run_simulation,
+        (params,))
+    return result.get(timeout)
 
 
 @view_config(route_name='home', renderer='templates/main_plot.pt')
@@ -23,7 +39,7 @@ def simulate_route(request):
     name_hash, _ = request.db.add_results(
         name,
         sim_params,
-        lambda: run_simulation(sim_params))
+        lambda: _async_simulation(sim_params))
 
     return {
         'url': request.route_url('simulation', id=name_hash),
