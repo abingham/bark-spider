@@ -13,8 +13,8 @@
 
     barkSpiderControllers.controller(
         'BarkSpiderCtrl',
-        ['$scope', '$http',
-         function($scope, $http) {
+        ['$scope', '$http', '$q',
+         function($scope, $http, $q) {
              $scope.simulations = [];
 
              // Create a new parameter set and append it to the list.
@@ -54,20 +54,22 @@
                          return s.included;
                      });
 
-                 $scope.labels = [];
-                 $scope.series = [];
-                 $scope.data = [];
+                 var labels = [];
+                 var series = [];
+                 var data = [];
 
-                 // TODO: Should we wait for all results to arrive,
-                 // construct final plotting variables, and then
-                 // update the $scope variables then? That might
-                 // improve performance. As it is, we might be causing
-                 // angular and/or the renderer to flail.
+                 // The strategy is to make all of the requests in
+                 // parallel, accumulating the results into the
+                 // variables labels, series, and data. Once we have
+                 // them all, we update the scope variables at one
+                 // time. The idea is that this prevents multiple
+                 // renderings of the same data, i.e. as it arrives
+                 // piecemeal.
 
                  var requests = _.map(
                      included_params,
                      function (p) {
-                         $http({
+                         return $http({
                              method: 'POST',
                              url: '/simulate',
                              data: JSON.stringify(p),
@@ -75,7 +77,7 @@
                                  'Content-Type': 'application/json'
                              }
                          }).then(function(response) {
-                             $http({
+                             return $http({
                                  method: 'GET',
                                  url: response.data.url
                              }).then(function(response) {
@@ -85,46 +87,21 @@
 
                                  // Only update labels if we have more data points
                                  var elapsed_time = results.elapsed_time;
-                                 if (_.size(elapsed_time) > $scope.labels.length) {
-                                     $scope.labels = _.values(elapsed_time);
+                                 if (_.size(elapsed_time) > labels.length) {
+                                     labels = _.values(elapsed_time);
                                  }
 
-                                 $scope.series.push(name);
-                                 $scope.data.push(_.values(results.software_development_rate));
+                                 series.push(name);
+                                 data.push(_.values(results.software_development_rate));
                              });
                          });
                      });
 
-                 // $q.all(requests).then(function(responses) {
-                 //     // Get all of the elapsed times from the response
-                 //     var elapsed_times = _.map(
-                 //         responses,
-                 //         function(s) { return s.elapsed_time; }
-                 //     );
-
-                 //     // Find the longest set of elapsed times. This
-                 //     // will define how large the plot needs to be.
-                 //     var longest_series = _.reduce(
-                 //         elapsed_times,
-                 //         function(accum, next){
-                 //             return _.size(next) > accum.length ? _.values(next) : accum;
-                 //         },
-                 //         []);
-
-                 //     $scope.labels = _.values(longest_series);
-
-                 //     $scope.series = [];
-                 //     $scope.data = [];
-
-                 //     // Collect the series names and rate values from
-                 //     // the response.
-                 //     _.map(
-                 //         _.pairs(response.data),
-                 //         function (p) {
-                 //             $scope.series.push(p[0]);
-                 //             $scope.data.push(_.values(p[1].software_development_rate));
-                 //         });
-                 // });
+                 $q.all(requests).then(function(_) {
+                     $scope.labels = labels;
+                     $scope.series = series;
+                     $scope.data = data;
+                 });
              };
 
              // Create a starter parameter set.
