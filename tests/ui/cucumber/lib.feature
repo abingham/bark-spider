@@ -39,3 +39,19 @@ Feature: Simulation parameter sets
     When I exclude parameter set 0
     And I include parameter set 0
     Then parameter set 0 is marked as included
+
+Feature: Running simulations
+  As a use of bark-spider
+  I should be able to run simulations and see graphs of the results
+
+  @dev
+  Scenario: The results plot is initially empty
+    Given I go to the front page
+    Then the plot is empty
+  
+  @dev
+  Scenario: I can submit one parameter block for simulation
+    Given I go to the front page
+    When I run the simulation
+    Then the plot is not empty
+

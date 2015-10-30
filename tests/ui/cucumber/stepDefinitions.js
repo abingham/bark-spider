@@ -8,7 +8,7 @@ var expect = chai.expect;
 
 // Chai expect().to.exist syntax makes default jshint unhappy.
 // jshint expr:true
-
+2
 var MainPage = require('./main_page.js');
 
 module.exports = function() {
@@ -73,5 +73,17 @@ module.exports = function() {
         var included = page.parametersIncluded(index);
         var expected = state == 'included';
         return included == expected;
+    });
+
+    this.Then(/^the plot is( not)? empty$/, function(state) {
+        var expected = (state) ? false : true;
+
+        return page.chartIsEmpty().then(function(e) {
+            expect(e).to.equal(expected);
+        });
+    });
+
+    this.When(/^I run the simulation$/, function() {
+        return page.runSimulation();
     });
 };
