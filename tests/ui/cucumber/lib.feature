@@ -44,12 +44,10 @@ Feature: Running simulations
   As a use of bark-spider
   I should be able to run simulations and see graphs of the results
 
-  @dev
   Scenario: The results plot is initially empty
     Given I go to the front page
     Then the plot is empty
   
-  @dev
   Scenario: I can submit one parameter block for simulation
     Given I go to the front page
     When I run the simulation
