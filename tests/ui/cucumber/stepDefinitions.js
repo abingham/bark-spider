@@ -18,16 +18,33 @@ module.exports = function() {
 
     this.Given(/^I go to the front page$/, function() {
         page = new MainPage();
-        return page.get();
+        return page.get().then(function() {
+            page.paramCount().then(function(c) {
+                startParamCount = c;
+            });
+        });
     });
 
-    this.Then(/^there should be (\d+) parameter sets?$/, function(expected_count) {
-        var expected_count = Number(expected_count);
+    this.Then(/^there should be (\d+) parameter sets?$/, function(count) {
+        count = Number(count);
+
         return page.paramCount().then(
             function(c) {
-                expect(c).to.equal(expected_count);
+                expect(c).to.equal(count);
             });
     });
+
+    this.Then(/^there should be (\d+) (new|fewer) parameter sets?$/, function(count, direction) {
+        count = Number(count);
+
+        var expected = direction == 'new' ? startParamCount + count : startParamCount - count;
+
+        return page.paramCount().then(
+            function(c) {
+                expect(c).to.equal(expected);
+            });
+    });
+
 
     this.When(/^I add a parameter set$/, function () {
         return page.addParameter();

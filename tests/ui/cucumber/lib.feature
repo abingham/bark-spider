@@ -10,12 +10,12 @@ Feature: Simulation parameter sets
   Scenario: Create new parameter set
     Given I go to the front page 	    	
     And I add a parameter set
-    Then there should be 2 parameter sets
+    Then there should be 1 new parameter set
 
   Scenario: Delete parameter set
     Given I go to the front page
     And I delete a parameter set
-    Then there should be 0 parameter sets
+    Then there should be 1 fewer parameter sets
 
   Scenario: Unhide parameter set
     Given I go to the front page
