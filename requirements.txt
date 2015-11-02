@@ -2,4 +2,4 @@
 
 -e git+git@github.com:sixty-north/brooks.git#egg=brooks
 -e .
--e git+git@github.com:abingham/bark-spider-interventions.git
+-e git+git@github.com:abingham/bark-spider-interventions.git#egg=bark_spider_interventions
