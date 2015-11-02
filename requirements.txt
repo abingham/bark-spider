@@ -1,0 +1,4 @@
+--index-url https://pypi.python.org/simple/
+
+-e git+git@github.com:sixty-north/brooks.git#egg=brooks
+-e .
