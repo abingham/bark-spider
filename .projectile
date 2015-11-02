@@ -1,0 +1,7 @@
+-/dist
+-/build
+-/bark_spider/__pycache__
+-/bark_spider/simulation/__pycache__
+-/tests/ui/node_modules
+-/bark_spider.egg-info
+-*~
