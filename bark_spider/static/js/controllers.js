@@ -38,6 +38,15 @@
                  $scope.simulations.splice(index, 1);
              };
 
+             // Find parameter sets which are included/enabled
+             $scope.included_params = function() {
+                 return _.filter(
+                     $scope.simulations,
+                     function (s) {
+                         return s.included;
+                     });
+             };
+
              $scope.labels = [];
              $scope.series = [];
              $scope.data = [];
@@ -48,12 +57,6 @@
 
              // Run a simulation using the currently configured parameter sets
              $scope.simulate = function() {
-                 var included_params = _.filter(
-                     $scope.simulations,
-                     function (s) {
-                         return s.included;
-                     });
-
                  var labels = [];
                  var series = [];
                  var data = [];
@@ -67,7 +70,7 @@
                  // piecemeal.
 
                  var requests = _.map(
-                     included_params,
+                     $scope.included_params(),
                      function (p) {
                          return $http({
                              method: 'POST',
