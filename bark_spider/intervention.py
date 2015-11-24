@@ -5,6 +5,11 @@ import stevedore
 
 _INTERVENTIONS = None
 
+
+class ParseError(Exception):
+    pass
+
+
 def _interventions():
     """Get the dict mapping tag names to Intervention subclasses.
 
@@ -30,16 +35,26 @@ def _parse_intervention(line):
     This find the Intervention plugin associated with the command
     portion of the line. It then ues the plugin to construct the right
     Intervention instance.
+
+    Raises:
+        ParseError: Unknown or malformed intervention encountered.
     """
     assert line
 
-    (command, time, *args) = line.split()
+    try:
+        (command, time, *args) = line.split()
+    except ValueError:
+        raise ParseError(
+            'Interventions must follow the form "<name> <time> \
+            [args . . .]" (value={})'.format(
+                line))
+
     command = command.lower()
 
     try:
         cls = _interventions()[command]
     except KeyError:
-        raise ValueError(
+        raise ParseError(
             'Unknown command "{}" while parsing interventions. '
             '(full command={})'.format(
                 command, line))
@@ -47,7 +62,7 @@ def _parse_intervention(line):
     try:
         return cls.make_instance(int(time), *args)
     except Exception as e:
-        raise ValueError(
+        raise ParseError(
             'Invalid command while parsing intervention: {}'.format(
                 line)) from e
 
@@ -59,6 +74,9 @@ def parse_interventions(stream):
         stream: A file-like object containing the interventions DSL.
 
     Returns: An iterable of Intervention instances.
+
+    Raises:
+        ValueError: If there is an error parsing the stream.
     """
     stripped_lines = map(str.strip, stream.readlines())
     non_empty_lines = filter(bool, stripped_lines)

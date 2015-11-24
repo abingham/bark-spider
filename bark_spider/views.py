@@ -1,14 +1,18 @@
+from io import StringIO
 import json
 import multiprocessing.pool
 
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 from pyramid.view import view_config
 
 
+from .intervention import parse_interventions, ParseError
 from .json_util import DataFrameJSONEncoder
 from .simulation.simulation import run_simulation
 
 _sim_pool = multiprocessing.pool.Pool()
+
 
 def _async_simulation(params, timeout=5):
     """Run a simulation asynchronously.
@@ -34,12 +38,26 @@ def main_plot(request):
              renderer='json')
 def simulate_route(request):
     name = request.json_body['name']
-    sim_params = request.json_body['parameters']
 
-    name_hash, _ = request.db.add_results(
-        name,
-        sim_params,
-        lambda: _async_simulation(sim_params))
+    # We have to distinguish between a) `index params` which are used as part
+    # of the index in the database and b) `run params` which contain parsed
+    # interventions (and are hence not json-serializable and therefor not
+    # suitable for indexing).
+    index_params = request.json_body['parameters']
+
+    run_params = index_params.copy()
+    run_params['interventions'] = parse_interventions(
+        StringIO(run_params['interventions']))
+
+    try:
+        name_hash, _ = request.db.add_results(
+            name,
+            index_params,
+            lambda: _async_simulation(run_params))
+    except ParseError as e:
+        # Note the dissonance here. The intervention ParseError happens here
+        # because of lazy parsing, while you might expect it to happen above.
+        raise HTTPBadRequest(body=e.args[0])
 
     return {
         'url': request.route_url('simulation', id=name_hash),

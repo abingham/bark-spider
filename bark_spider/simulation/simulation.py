@@ -10,16 +10,13 @@ from .schedule import make_schedule
 def run_simulation(params):
     """Run a set of simulations using various parameter sets.
 
-    Args:
-        params: A dict-like object that will be unpacked as the
-            arguments to schedule.make_schedule. In other words, it
-            should be key-value pairs defining the state variables for
-            the simulations. The "interventions" value should be a
-            string containing the intervention DSL to process.
+    Args: params: A dict-like object that will be unpacked as the arguments to
+        schedule.make_schedule. In other words, it should be key-value pairs
+        defining the state variables for the simulations. The "interventions"
+        value should be an iterable of `Intervention` instances.
 
     Returns: A pandas.DataFrame with three columns - step_number,
-    elapsed_time, and software_development_rate.
-
+        elapsed_time, and software_development_rate.
     """
     attributes = ['software_development_rate']
 

@@ -12,6 +12,7 @@ JSON data has changed.
 import json
 import unittest
 from pyramid import testing
+from pyramid.httpexceptions import HTTPBadRequest
 
 from bark_spider.json_util import DataFrameJSONEncoder
 from bark_spider.simulation.simulation import run_simulation
@@ -39,8 +40,26 @@ TEST_DATA = [
      },
 ]
 
+MALFORMED_INTERVENTION_REQUEST = {
+    'name': 'test params',
+    'parameters': {
+        'assimilation_delay': 20,
+        'training_overhead_proportion': 0.25,
+        'interventions': 'no_timestamp_provided',
+        'num_function_points_requirements': 10
+    }}
 
-class SimulateRouteTest(unittest.TestCase):
+UNKNOWN_INTERVENTION_REQUEST = {
+    'name': 'test params',
+    'parameters': {
+        'assimilation_delay': 20,
+        'training_overhead_proportion': 0.25,
+        'interventions': 'no_such_intervention_i_hope 1234',
+        'num_function_points_requirements': 10
+    }}
+
+
+class SimulateRouteTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
@@ -83,6 +102,7 @@ class SimulateRouteTest(unittest.TestCase):
             request.json_body = req_data
             response = simulate_route(request)
             result_id = response['result-id']
+            self.assertNotIn('error', response)
 
             # Now request the result
             request = self.make_request()
@@ -107,3 +127,19 @@ class SimulateRouteTest(unittest.TestCase):
 
             self.assertEqual(
                 response.content_type, 'application/json')
+
+    def test_simulate_route_with_malformed_intervention(self):
+        from bark_spider.views import simulate_route
+
+        request = self.make_request()
+        request.json_body = MALFORMED_INTERVENTION_REQUEST
+        with self.assertRaises(HTTPBadRequest):
+            simulate_route(request)
+
+    def test_simulate_route_with_unknown_intervention(self):
+        from bark_spider.views import simulate_route
+
+        request = self.make_request()
+        request.json_body = UNKNOWN_INTERVENTION_REQUEST
+        with self.assertRaises(HTTPBadRequest):
+            simulate_route(request)

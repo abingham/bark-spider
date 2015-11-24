@@ -1,11 +1,7 @@
-from io import StringIO
-
 from brooks.state import State
 from brooks.communication import (
     gompertz_overhead_proportion,
 )
-
-from ..intervention import parse_interventions
 
 
 class Schedule:
@@ -48,6 +44,7 @@ def make_schedule(assimilation_delay,
 
     Args:
         assimilation_delay: Numer of days needed to assimilate new developers.
+        interventions: An iterable of `Intervention` instances.
 
     Returns:
         A new State object.
@@ -70,5 +67,4 @@ def make_schedule(assimilation_delay,
         cumulative_person_days=0,
     )
 
-    return Schedule(state,
-                    parse_interventions(StringIO(interventions)))
+    return Schedule(state, interventions)

@@ -17,6 +17,8 @@
          function($scope, $http, $q) {
              $scope.simulations = [];
 
+             $scope.error_messages = [];
+
              // Create a new parameter set and append it to the list.
              $scope.add_simulation = function(name) {
                  var sim = {
@@ -69,6 +71,7 @@
                  // renderings of the same data, i.e. as it arrives
                  // piecemeal.
 
+                 $scope.error_messages = [];
                  var requests = _.map(
                      $scope.included_params(),
                      function (p) {
@@ -79,25 +82,31 @@
                              headers: {
                                  'Content-Type': 'application/json'
                              }
-                         }).then(function(response) {
-                             return $http({
-                                 method: 'GET',
-                                 url: response.data.url
-                             }).then(function(response) {
-                                 var name = response.data.name;
-                                 var results = response.data.results;
-                                 var parameters = response.data.parameters;
-
-                                 // Only update labels if we have more data points
-                                 var elapsed_time = results.elapsed_time;
-                                 if (_.size(elapsed_time) > labels.length) {
-                                     labels = _.values(elapsed_time);
-                                 }
-
-                                 series.push(name);
-                                 data.push(_.values(results.software_development_rate));
-                             });
-                         });
+                         }).then(
+                             function(response) {
+                                 
+                                 return $http({
+                                     method: 'GET',
+                                     url: response.data.url
+                                 }).then(function(response) {
+                                     var name = response.data.name;
+                                     var results = response.data.results;
+                                     var parameters = response.data.parameters;
+                                     
+                                     // Only update labels if we have more data points
+                                     var elapsed_time = results.elapsed_time;
+                                     if (_.size(elapsed_time) > labels.length) {
+                                         labels = _.values(elapsed_time);
+                                     }
+                                     
+                                     series.push(name);
+                                     data.push(_.values(results.software_development_rate));
+                                 });
+                             },
+                             function(response) {
+                                 $scope.error_messages.push(response.data);
+                             }
+                         );
                      });
 
                  $q.all(requests).then(function(_) {

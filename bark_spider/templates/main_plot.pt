@@ -1,86 +1,103 @@
 <html>
-    <head>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-chart.js/0.8.5/angular-chart.min.css">
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-chart.js/0.8.5/angular-chart.min.css">
 
-	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-chart.js/0.8.5/angular-chart.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-chart.js/0.8.5/angular-chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
 
-	<script src="static/js/app.js"></script>
-	<script src="static/js/controllers.js"></script>
-    </head>
-    <body ng-app="BarkSpiderApp" ng-controller="BarkSpiderCtrl">
+    <script src="static/js/app.js"></script>
+    <script src="static/js/controllers.js"></script>
+  </head>
+  <body ng-app="BarkSpiderApp" ng-controller="BarkSpiderCtrl">
 
-	<div class="container-fluid">
-	    <div class="row">
-		<div class="col-md-4">
-		    <h1>Simulation parameters</h1>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-4">
+          <h1>Simulation parameters</h1>
 
-		    <button id="add-parameters-btn" type="button" class="btn btn-default" ng-click="add_simulation('New parameter set');">Add parameter set</button>
-		    <button type="button" class="btn btn-primary pull-right" ng-click="simulate()" ng-disabled="included_params().length == 0">Run simulation</button>
-		    <hr>
+          <div class="row">
+            <div class="col-md-12">
+              <button id="add-parameters-btn" type="button" class="btn btn-default" ng-click="add_simulation('New parameter set');">Add parameter set</button>
+              <button type="button" class="btn btn-primary pull-right" ng-click="simulate()" ng-disabled="included_params().length == 0">Run simulation</button>
+            </div>
+          </div>
 
-		    <div ng-repeat="simulation in simulations" ng-controller="ParameterSetCtrl">
-			<div>
-			    <div class="input-group input-group">
-				<span class="input-group-btn">
-				    <button type="button" class="hide-show-parameters form-control btn btn-default" ng-click="opened = !opened">
-					<span class="glyphicon" ng-class="{'glyphicon-chevron-down': opened, 'glyphicon-chevron-right': !opened}"></span>
-				    </button>
-				</span>
-				<input type="text" class="form-control" ng-model="simulation.name">
-				<div class="input-group-btn">
-				    <button type="button" class="btn btn-default include-exclude-parameters" ng-click="simulation.included = !simulation.included" ng-class="{'btn-info': !simulation.included}">
-					<span ng-switch="simulation.included">
-					    <span ng-switch-when="true">exclude</span>
-					    <span ng-switch-when="false">include</span>
-					</span>
-				    </button>
-				    <button type="button" class="btn btn-default" ng-click="remove_parameter_set($index);">
-					delete
-				    </button>
-				</div>
-			    </div>
-			</div>
-			<div uib-collapse="!opened">
-			    <form class="form-horizontal parameter-set-form">
-				<div class="form-group">
-			 	    <label class="col-sm-2 control-label">Assimilation delay (days)</label>
-			 	    <div class="col-sm-10">
-			 		<input class="form-control" type="number" min="0" value="20" ng-model="simulation.parameters.assimilation_delay"/>
-			 	    </div>
-				</div>
-                                <div class="form-group">
-			 	    <label class="col-sm-2 control-label">Training overhead (0-1)</label>
-			 	    <div class="col-sm-10">
-			 		<input class="form-control" type="number" min="0" value="1" ng-model="simulation.parameters.training_overhead_proportion"/>
-			 	    </div>
-				</div>
-				<div class="form-group">
-			 	    <label class="col-sm-2 control-label">Interventions</label>
-			 	    <div class="col-sm-10">
-			 	        <textarea class="form-control" ng-model="simulation.parameters.interventions"></textarea>
-			 	    </div>
-				</div>
-			    </form>
-			</div> <!-- uib-collapsed -->
-		    </div> <!-- repeat -->
-		</div>
-		<div class="col-md-8">
-		    <canvas id="software-development-rate-chart" class="chart chart-line" chart-data="data"
-                            chart-labels="labels" chart-legend="true" chart-series="series"
-			    chart-click="onClick"
-			    chart-options="options">
-		    </canvas>
-		</div>
-	    </div>
-	</div>
-    </body>
+          <hr>
+
+          <div ng-repeat="simulation in simulations" ng-controller="ParameterSetCtrl">
+            <div>
+              <div class="input-group input-group">
+                <span class="input-group-btn">
+                  <button type="button" class="hide-show-parameters form-control btn btn-default" ng-click="opened = !opened">
+                    <span class="glyphicon" ng-class="{'glyphicon-chevron-down': opened, 'glyphicon-chevron-right': !opened}"></span>
+                  </button>
+                </span>
+                <input type="text" class="form-control" ng-model="simulation.name">
+                <div class="input-group-btn">
+                  <button type="button" class="btn btn-default include-exclude-parameters" ng-click="simulation.included = !simulation.included" ng-class="{'btn-info': !simulation.included}">
+                    <span ng-switch="simulation.included">
+                      <span ng-switch-when="true">exclude</span>
+                      <span ng-switch-when="false">include</span>
+                    </span>
+                  </button>
+                  <button type="button" class="btn btn-default" ng-click="remove_parameter_set($index);">
+                    delete
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div uib-collapse="!opened">
+              <form class="form-horizontal parameter-set-form">
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">Assimilation delay (days)</label>
+                  <div class="col-sm-10">
+                    <input class="form-control" type="number" min="0" value="20" ng-model="simulation.parameters.assimilation_delay"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">Training overhead (0-1)</label>
+                  <div class="col-sm-10">
+                    <input class="form-control" type="number" min="0" value="1" ng-model="simulation.parameters.training_overhead_proportion"/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">Interventions</label>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" ng-model="simulation.parameters.interventions"></textarea>
+                  </div>
+                </div>
+              </form>
+            </div> <!-- uib-collapsed -->
+          </div> <!-- repeat -->
+        </div>
+        <div class="col-md-8">
+          <div ng-show="error_messages.length == 0">
+            <canvas id="software-development-rate-chart" class="chart chart-line" chart-data="data"
+                    chart-labels="labels" chart-legend="true" chart-series="series"
+                    chart-click="onClick"
+                    chart-options="options">
+            </canvas>
+          </div>
+
+          <div class="panel panel-default" ng-show="error_messages.length > 0">
+            <div class="panel-heading">Errors</div>
+            <div class="panel-body">
+              <div class="alert alert-danger" role="alert" ng-repeat="message in error_messages track by $index">
+                {{message}}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
