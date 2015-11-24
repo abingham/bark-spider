@@ -16,7 +16,7 @@ import unittest
 
 from pyramid import testing
 
-from .simulation_db import SimulationDatabase
+from bark_spider.simulation_db import SimulationDatabase
 
 
 TEST_DATA = [
@@ -81,7 +81,9 @@ class SimulateRouteTests(unittest.TestCase):
         return req
 
     def test_simulate_route(self):
-        from .views import simulate_route, simulation_route
+        self.maxDiff = None
+
+        from bark_spider.views import simulate_route, simulation_route
 
         for req_data, expected in TEST_DATA:
             # First request the results URL
