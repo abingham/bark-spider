@@ -1,8 +1,6 @@
 """Tests for the bark-spider JSON API.
 
-These are essentially approval tests. We've captured some input-output
-pairs and deemed those "correct". If there are deviations in the
-output (i.e. test failures) you should investigate them and either:
+These are essentially approval tests.
 
 * fix the code that causes the tests to fail, or
 * update the tests to reflect the new notion of correct
@@ -11,59 +9,38 @@ In other words, these are tests to detect that we've noticed that our
 JSON data has changed.
 
 """
-
+import json
 import unittest
-
 from pyramid import testing
 
+from bark_spider.json_util import DataFrameJSONEncoder
+from bark_spider.simulation.simulation import run_simulation
 from bark_spider.simulation_db import SimulationDatabase
 
+# TODO: We should probably use Hypothesis to generate this test data
 
 TEST_DATA = [
-    ({'name': 'test params',
-      'parameters': {
-          'assimilation_delay': 20,
-          'training_overhead_proportion': 0.25,
-          'interventions': '',
-          'num_function_points_requirements': 10
-      }
-    },
-     {"step_number": {
-         "1": "1", "4": "4", "5": "5", "10": "10", "6": "6", "2": "2",
-         "8": "8", "7": "7", "0": "0", "9": "9", "3": "3"},
-       "software_development_rate": {
-           "1": "0.8065923869047285", "4": "0.9495863290658887",
-           "5": "0.9925659718916292", "10": "0", "6": "1.0333966325760826",
-           "2": "0.8567217268385271", "8": "1.109035431494033",
-           "7": "1.0721857602263134", "0": "0", "9": "1.1440426191983664",
-           "3": "0.9043445997756356"},
-       "elapsed_time": {
-           "1": "1", "4": "4", "5": "5", "10": "10", "6": "6",
-           "2": "2", "8": "8", "7": "7", "0": "0", "9": "9",
-           "3": "3"}}),
+    {'name': 'test params',
+     'parameters': {
+         'assimilation_delay': 20,
+         'training_overhead_proportion': 0.25,
+         'interventions': '',
+         'num_function_points_requirements': 10
+     }
+     },
 
-    ({'name': 'test params1',
-      'parameters': {
-          'assimilation_delay': 20,
-          'training_overhead_proportion': 0.25,
-          'interventions': '',
-          'num_function_points_requirements': 5
-      },
-    },
-    {'step_number': {
-        '5': '5', '1': '1', '2': '2', '4': '4', '3': '3',
-        '6': '6', '0': '0'},
-     'elapsed_time': {
-         '5': '5', '1': '1', '2': '2', '4': '4', '3': '3',
-         '6': '6', '0': '0'},
-     'software_development_rate': {
-         '5': '0.9925659718916292', '1': '0.8065923869047285',
-         '2': '0.8567217268385271', '4': '0.9495863290658887',
-         '3': '0.9043445997756356', '6': '0', '0': '0'}}),
-    ]
+    {'name': 'test params1',
+     'parameters': {
+         'assimilation_delay': 20,
+         'training_overhead_proportion': 0.25,
+         'interventions': '',
+         'num_function_points_requirements': 5
+     }
+     },
+]
 
 
-class SimulateRouteTests(unittest.TestCase):
+class SimulateRouteTest(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
@@ -85,29 +62,45 @@ class SimulateRouteTests(unittest.TestCase):
 
         from bark_spider.views import simulate_route, simulation_route
 
-        for req_data, expected in TEST_DATA:
+        for req_data in TEST_DATA:
+            # Unpack the initial values
+            simulation_name = req_data['name']
+            simulation_paramaters = req_data['parameters']
+
+            # Determine the expected results by calling the simulator directly
+            expected_simulation_results_frame = run_simulation(simulation_paramaters)
+
+            # Roundtrip the results through our JSON encoder to get data the same shape
+            # - note that this means that any flaws in the JSON encoder will NOT be
+            # revealed by this test.
+            expected_simulation_results_json = json.dumps(
+                expected_simulation_results_frame,
+                cls=DataFrameJSONEncoder)
+            expected_simulation_results_dict = json.loads(expected_simulation_results_json)
+
             # First request the results URL
             request = self.make_request()
             request.json_body = req_data
             response = simulate_route(request)
             result_id = response['result-id']
 
-            # now request the result
+            # Now request the result
             request = self.make_request()
             request.matchdict['id'] = result_id
             response = simulation_route(request)
 
+            # Do they match?
             self.assertEqual(
                 response.json_body['name'],
-                req_data['name'])
+                simulation_name)
 
             self.assertEqual(
                 response.json_body['parameters'],
-                req_data['parameters'])
+                simulation_paramaters)
 
             self.assertEqual(
                 response.json_body['results'],
-                expected)
+                expected_simulation_results_dict)
 
             self.assertEqual(
                 response.status_code, 200)
