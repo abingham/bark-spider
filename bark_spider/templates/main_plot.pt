@@ -24,7 +24,7 @@
 		    <h1>Simulation parameters</h1>
 
 		    <button id="add-parameters-btn" type="button" class="btn btn-default" ng-click="add_simulation('New parameter set');">Add parameter set</button>
-		    <button type="button" class="btn btn-primary pull-right" ng-click="simulate()">Run simulation</button>
+		    <button type="button" class="btn btn-primary pull-right" ng-click="simulate()" ng-disabled="included_params().length == 0">Run simulation</button>
 		    <hr>
 
 		    <div ng-repeat="simulation in simulations" ng-controller="ParameterSetCtrl">
