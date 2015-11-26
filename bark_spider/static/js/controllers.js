@@ -71,7 +71,7 @@
                  // renderings of the same data, i.e. as it arrives
                  // piecemeal.
 
-                 $scope.error_messages = [];
+                 var error_messages = [];
                  var requests = _.map(
                      $scope.included_params(),
                      function (p) {
@@ -104,7 +104,7 @@
                                  });
                              },
                              function(response) {
-                                 $scope.error_messages.push(response.data);
+                                 error_messages.push(response.data);
                              }
                          );
                      });
@@ -113,6 +113,7 @@
                      $scope.labels = labels;
                      $scope.series = series;
                      $scope.data = data;
+                     $scope.error_messages = error_messages;
                  });
              };
 
