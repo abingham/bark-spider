@@ -18,10 +18,17 @@ class SimulationDatabase:
         return (name_hash, params_hash)
 
     def lookup(self, name_hash):
+        """Lookup the simulation results associated with name_hash.
+
+        Returns:
+            A 3-tuple of (name, params, results).
+
+        Raises:
+            KeyError: If there are no results associated with name_hash.
+        """
         name, params_hash = self._names[name_hash]
         params, results = self._results[params_hash]
         return (name, params, results)
-
 
     @staticmethod
     def _hash_request(name, params):
