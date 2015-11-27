@@ -2,7 +2,7 @@ from io import StringIO
 import json
 import multiprocessing.pool
 
-from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from pyramid.response import Response
 from pyramid.view import view_config
 
@@ -57,7 +57,7 @@ def simulate_route(request):
     except ParseError as e:
         # Note the dissonance here. The intervention ParseError happens here
         # because of lazy parsing, while you might expect it to happen above.
-        raise HTTPBadRequest(body=e.args[0])
+        raise HTTPBadRequest(body=str(e))
 
     return {
         'url': request.route_url('simulation', id=name_hash),
@@ -69,7 +69,10 @@ def simulate_route(request):
              request_method='GET')
 def simulation_route(request):
     name_hash = request.matchdict['id']
-    name, sim_params, sim_results = request.db.lookup(name_hash)
+    try:
+        name, sim_params, sim_results = request.db.lookup(name_hash)
+    except KeyError as e:
+        raise HTTPNotFound(body="No such simulation id {}".format(e))
 
     results = {
         'name': name,
