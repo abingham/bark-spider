@@ -1,7 +1,10 @@
 module BarkSpider where
 
+import Effects exposing (Effects)
 import Html exposing (Html, node, text)
 import Html.Attributes exposing (href, rel, src)
+
+import StartApp
 
 import Bootstrap.Html exposing (colMd_, container_, row_)
 
@@ -26,11 +29,27 @@ type alias Model =
   , error_messages : List String
   }
 
+createModel : Model
+createModel =
+  { simulations = []
+  , error_messages = []
+  }
+
 --
 -- update
 --
 
 type Input = Nothing
+
+update : Input -> Model -> (Model, Effects Input)
+update input model =
+  let
+    m =
+      case input of
+        Nothing ->
+          model
+  in
+    noFx m
 
 --
 -- view
@@ -44,11 +63,6 @@ script url = node "script" [src url] []
 
 view : Signal.Address Input -> Model -> Html
 view address model =
-  -- let
-  --   -- cell_renderer = renderCell
-  --   -- grid_size = model.cell_size * model.grid.num_cols
-  --   -- elem = renderGrid model.grid grid_size grid_size cell_renderer
-  -- in
     container_
     [ stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
     , stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"
@@ -64,3 +78,25 @@ view address model =
            ]
         ]
     ]
+
+--
+-- Utilities
+--
+
+noFx : model -> (model, Effects a)
+noFx model = (model, Effects.none)
+
+--
+-- Main stuff
+--
+
+app : StartApp.App Model
+app = StartApp.start
+      { init = noFx (createModel)
+      , view = view
+      , update = update
+      , inputs = []
+      }
+
+main : Signal Html
+main = app.html
