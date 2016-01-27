@@ -8,9 +8,10 @@ import List
 import StartApp
 
 import Bootstrap.Html exposing (..)
+import List.Extra exposing (getAt)
 
 import BarkSpider.Simulation as Sim
-import BarkSpider.Util exposing (nth, setAt)
+import BarkSpider.Util exposing (setAt)
 
 --
 -- model
@@ -39,7 +40,7 @@ update input model =
     m =
       case input of
         Modify index action ->
-          case nth model.simulations index of
+          case getAt model.simulations index of
             Nothing ->
               model
 
