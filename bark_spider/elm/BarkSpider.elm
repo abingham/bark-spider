@@ -9,30 +9,21 @@ import StartApp
 
 import Bootstrap.Html exposing (..)
 
+import BarkSpider.Simulation as Sim
+import BarkSpider.Util exposing (nth, setAt)
+
 --
 -- model
 --
 
-type alias Parameters =
-  { assimilation_delay : Int
-  , training_overhead_proportion : Float
-  , interventions : String
-  }
-
-type alias Simulation =
-  { name : String
-  , included : Bool
-  , parameters : Parameters
-  }
-
 type alias Model =
-  { simulations : List Simulation
+  { simulations : List Sim.Simulation
   , error_messages : List String
   }
 
 createModel : Model
 createModel =
-  { simulations = [{name = "sim1", included = True, parameters = {assimilation_delay = 20, training_overhead_proportion = 0.2, interventions = ""}}]
+  { simulations = [{name = "sim1", included = True, hidden = False, parameters = {assimilation_delay = 20, training_overhead_proportion = 0.2, interventions = ""}}]
   , error_messages = []
   }
 
@@ -40,14 +31,27 @@ createModel =
 -- update
 --
 
-type Input = Nothing
+type Input = Modify Int Sim.Action | Null
 
 update : Input -> Model -> (Model, Effects Input)
 update input model =
   let
     m =
       case input of
-        Nothing ->
+        Modify index action ->
+          case nth model.simulations index of
+            Nothing ->
+              model
+
+            Just sim ->
+              case setAt model.simulations index (Sim.update action sim) of
+                Nothing ->
+                  model -- TODO: Assert...this should never happen...
+
+                Just sims ->
+                  {model | simulations = sims}
+
+        Null ->
           model
   in
     noFx m
@@ -62,25 +66,6 @@ stylesheet url = node "link" [ rel "stylesheet", href url] []
 script : String -> Html
 script url = node "script" [src url] []
 
-simulationRow : Signal.Address Input -> Simulation -> Html
-simulationRow address sim =
-  let
-    icon = { btnParam | icon = Just (glyphiconChevronDown' "") }
-    included_text = { btnParam | label = Just (if sim.included then "exclude" else "include") }
-    delete_text = { btnParam | label = Just "delete" }
-  in
-    row_
-         [ div [class "input-group"]
-             [ span [ class "input-group-btn" ] [ btnDefault' "form-control" icon address Nothing ] -- this toggles visibility of sim details
-             , input [ type' "text", class "form-control", value sim.name ] [] -- How do we update sim.name when this value changes?
-             , div [ class "input-group-btn"]
-                   [ btnDefault' "" included_text address Nothing
-                   , btnDefault' "" delete_text address Nothing
-                   ]
-             ]
-             
-         ]
-
 view : Signal.Address Input -> Model -> Html
 view address model =
     containerFluid_
@@ -92,11 +77,11 @@ view address model =
            [ h1 [] [text "Simulation Parameters"]
            , row_
                [ colMd_ 12 12 12
-                   [ btnDefault' "" {btnParam | label = Just "Add parameter set"} address Nothing
-                   , btnDefault' "pull-right" {btnParam | label = Just "Run simulation"} address Nothing
+                   [ btnDefault' "" {btnParam | label = Just "Add parameter set"} address Null
+                   , btnDefault' "pull-right" {btnParam | label = Just "Run simulation"} address Null
                    ]
                ]
-           , div [] (List.map (simulationRow address) model.simulations)
+           , div [] (List.indexedMap (\index sim -> Sim.view (Signal.forwardTo address (Modify index)) sim) model.simulations)
            ]
         , colMd_ 6 6 6
            [ text "emus"
