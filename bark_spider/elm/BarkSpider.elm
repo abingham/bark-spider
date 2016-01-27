@@ -66,14 +66,17 @@ simulationRow : Signal.Address Input -> Simulation -> Html
 simulationRow address sim =
   let
     icon = { btnParam | icon = Just (glyphiconChevronDown' "") }
+    included_text = { btnParam | label = Just (if sim.included then "exclude" else "include") }
+    delete_text = { btnParam | label = Just "delete" }
   in
     row_
          [ div [class "input-group"]
-             [ span [class "input-group-btn"]
-                 [ btnDefault' "form-control" icon address Nothing
-                     
-                 ]
-                 
+             [ span [ class "input-group-btn" ] [ btnDefault' "form-control" icon address Nothing ] -- this toggles visibility of sim details
+             , input [ type' "text", class "form-control", value sim.name ] [] -- How do we update sim.name when this value changes?
+             , div [ class "input-group-btn"]
+                   [ btnDefault' "" included_text address Nothing
+                   , btnDefault' "" delete_text address Nothing
+                   ]
              ]
              
          ]
