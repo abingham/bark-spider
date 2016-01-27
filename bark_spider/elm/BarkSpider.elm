@@ -8,56 +8,65 @@ import List
 import StartApp
 
 import Bootstrap.Html exposing (..)
-import List.Extra exposing (getAt)
+import List.Extra exposing (getAt, removeWhen)
 
 import BarkSpider.Simulation as Sim
-import BarkSpider.Util exposing (removeAt, setAt)
 
 --
 -- model
 --
 
+type alias ID = Int
+
 type alias Model =
-  { simulations : List Sim.Simulation
+  { simulations : List (ID, Sim.Simulation)
   , error_messages : List String
+  , next_id : Int
   }
 
 createModel : Model
 createModel =
-  { simulations = [{name = "sim1", included = True, hidden = False, parameters = {assimilation_delay = 20, training_overhead_proportion = 0.2, interventions = ""}}]
-  , error_messages = []
-  }
+  let
+    params = {assimilation_delay = 20, training_overhead_proportion = 0.2, interventions = ""}
+    sim = {name = "sim1", included = True, hidden = False, parameters = params}
+  in
+    { simulations = [(0, sim)]
+    , error_messages = []
+    , next_id = 1
+    }
 
 --
 -- update
 --
 
-type Input = Modify Int Sim.Action | Null
+type Action
+  = Modify ID Sim.Action
+  | Null
 
-updateModify : Int -> Sim.Action -> Model -> Model
-updateModify index action model =
-  case action of
-    Sim.Delete ->
-      {model | simulations = removeAt model.simulations index}
+updateModify : ID -> Sim.Action -> Model -> Model
+updateModify id action model =
+  let
+    modifySimulation (simId, sim) =
+      if simId == id then
+        (simId, Sim.update action sim)
+      else
+        (simId, sim)
+    matchId (simId, sim) = simId == id
+    sims = 
+      case action of
+        Sim.Delete ->
+          removeWhen matchId model.simulations
 
-    _ ->
-      case getAt model.simulations index of
-        Nothing ->
-          model
+        _ ->
+          List.map modifySimulation model.simulations
+  in
+    {model | simulations = sims}
 
-        Just sim ->
-          case setAt model.simulations index (Sim.update action sim) of
-            Nothing ->
-              model -- TODO: Assert...this should never happen...
-
-            Just sims ->
-              {model | simulations = sims}
-
-update : Input -> Model -> (Model, Effects Input)
-update input model =
+update : Action -> Model -> (Model, Effects Action)
+update action model =
   let
     m =
-      case input of
+      case action of
         Modify index action ->
           updateModify index action model
 
@@ -76,7 +85,10 @@ stylesheet url = node "link" [ rel "stylesheet", href url] []
 script : String -> Html
 script url = node "script" [src url] []
 
-view : Signal.Address Input -> Model -> Html
+simView : Signal.Address Action -> (ID, Sim.Simulation)  -> Html
+simView address (id, sim) = Sim.view (Signal.forwardTo address (Modify id)) sim
+
+view : Signal.Address Action -> Model -> Html
 view address model =
     containerFluid_
     [ stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
@@ -91,7 +103,7 @@ view address model =
                    , btnDefault' "pull-right" {btnParam | label = Just "Run simulation"} address Null
                    ]
                ]
-           , div [] (List.indexedMap (\index sim -> Sim.view (Signal.forwardTo address (Modify index)) sim) model.simulations)
+           , div [] (List.map (simView address) model.simulations)
            ]
         , colMd_ 6 6 6
            [ text "emus"
