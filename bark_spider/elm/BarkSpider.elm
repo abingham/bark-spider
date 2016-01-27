@@ -1,12 +1,13 @@
 module BarkSpider where
 
 import Effects exposing (Effects)
-import Html exposing (Html, node, text)
-import Html.Attributes exposing (href, rel, src)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import List
 
 import StartApp
 
-import Bootstrap.Html exposing (colMd_, container_, row_)
+import Bootstrap.Html exposing (..)
 
 --
 -- model
@@ -31,7 +32,7 @@ type alias Model =
 
 createModel : Model
 createModel =
-  { simulations = []
+  { simulations = [{name = "sim1", included = True, parameters = {assimilation_delay = 20, training_overhead_proportion = 0.2, interventions = ""}}]
   , error_messages = []
   }
 
@@ -61,18 +62,40 @@ stylesheet url = node "link" [ rel "stylesheet", href url] []
 script : String -> Html
 script url = node "script" [src url] []
 
+simulationRow : Signal.Address Input -> Simulation -> Html
+simulationRow address sim =
+  let
+    icon = { btnParam | icon = Just (glyphiconChevronDown' "") }
+  in
+    row_
+         [ div [class "input-group"]
+             [ span [class "input-group-btn"]
+                 [ btnDefault' "form-control" icon address Nothing
+                     
+                 ]
+                 
+             ]
+             
+         ]
+
 view : Signal.Address Input -> Model -> Html
 view address model =
-    container_
+    containerFluid_
     [ stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
     , stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"
     , script "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"
     , row_
-        [colMd_ 2 2 2
-           [ text "llamas"
-           , text "yaks"
+        [colMd_ 4 4 4
+           [ h1 [] [text "Simulation Parameters"]
+           , row_
+               [ colMd_ 12 12 12
+                   [ btnDefault' "" {btnParam | label = Just "Add parameter set"} address Nothing
+                   , btnDefault' "pull-right" {btnParam | label = Just "Run simulation"} address Nothing
+                   ]
+               ]
+           , div [] (List.map (simulationRow address) model.simulations)
            ]
-        , colMd_ 10 10 10
+        , colMd_ 6 6 6
            [ text "emus"
            , text "platypuses...platypi? Not sure."
            ]
