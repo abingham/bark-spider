@@ -11,7 +11,7 @@ import Bootstrap.Html exposing (..)
 import List.Extra exposing (getAt)
 
 import BarkSpider.Simulation as Sim
-import BarkSpider.Util exposing (setAt)
+import BarkSpider.Util exposing (removeAt, setAt)
 
 --
 -- model
@@ -34,23 +34,32 @@ createModel =
 
 type Input = Modify Int Sim.Action | Null
 
+updateModify : Int -> Sim.Action -> Model -> Model
+updateModify index action model =
+  case action of
+    Sim.Delete ->
+      {model | simulations = removeAt model.simulations index}
+
+    _ ->
+      case getAt model.simulations index of
+        Nothing ->
+          model
+
+        Just sim ->
+          case setAt model.simulations index (Sim.update action sim) of
+            Nothing ->
+              model -- TODO: Assert...this should never happen...
+
+            Just sims ->
+              {model | simulations = sims}
+
 update : Input -> Model -> (Model, Effects Input)
 update input model =
   let
     m =
       case input of
         Modify index action ->
-          case getAt model.simulations index of
-            Nothing ->
-              model
-
-            Just sim ->
-              case setAt model.simulations index (Sim.update action sim) of
-                Nothing ->
-                  model -- TODO: Assert...this should never happen...
-
-                Just sims ->
-                  {model | simulations = sims}
+          updateModify index action model
 
         Null ->
           model

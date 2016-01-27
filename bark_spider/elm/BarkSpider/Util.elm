@@ -12,3 +12,16 @@ setAt l index value =
 
       Just t ->
         Just (value :: t |> List.append head)
+
+removeAt : List a -> Int -> List a
+removeAt l index =
+  let
+    head = List.take index l
+    tail = List.drop index l |> List.tail
+  in
+    case tail of
+      Nothing ->
+        l
+
+      Just t ->
+        List.append head t

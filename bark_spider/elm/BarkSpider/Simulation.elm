@@ -73,10 +73,10 @@ view address sim =
   in
     row_
          [ div [class "input-group"]
-             [ span [ class "input-group-btn" ] [ btnDefault' "form-control" icon address (SetHidden False) ] -- this toggles visibility of sim details
+             [ span [ class "input-group-btn" ] [ btnDefault' "form-control" icon address (SetHidden (not sim.hidden)) ] -- this toggles visibility of sim details
              , input [ type' "text", class "form-control", value sim.name ] [] -- How do we update sim.name when this value changes?
              , div [ class "input-group-btn"]
-                 [ btnDefault' "" included_text address (SetIncluded True)
+                 [ btnDefault' "" included_text address (SetIncluded (not sim.included))
                  , btnDefault' "" delete_text address Delete
                  ]
              ]
