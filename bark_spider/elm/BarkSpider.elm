@@ -18,8 +18,12 @@ import BarkSpider.Simulation as Sim
 
 type alias ID = Int
 
+type alias ViewState =
+  { opened : Bool
+  }
+
 type alias Model =
-  { simulations : List (ID, Sim.Simulation)
+  { simulations : List (ID, ViewState, Sim.Simulation)
   , error_messages : List String
   , next_id : Int
   }
@@ -30,7 +34,7 @@ createModel =
     params = {assimilation_delay = 20, training_overhead_proportion = 0.2, interventions = ""}
     sim = {name = "sim1", included = True, hidden = False, parameters = params}
   in
-    { simulations = [(0, sim)]
+    { simulations = [(0, {opened = True}, sim)]
     , error_messages = []
     , next_id = 1
     }
@@ -46,12 +50,12 @@ type Action
 updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
   let
-    modifySimulation (simId, sim) =
+    modifySimulation (simId, viewState, sim) =
       if simId == id then
-        (simId, Sim.update action sim)
+        (simId, viewState, Sim.update action sim)
       else
-        (simId, sim)
-    matchId (simId, sim) = simId == id
+        (simId, viewState, sim)
+    matchId (simId, viewState, sim) = simId == id
     sims = 
       case action of
         Sim.Delete ->
@@ -85,8 +89,8 @@ stylesheet url = node "link" [ rel "stylesheet", href url] []
 script : String -> Html
 script url = node "script" [src url] []
 
-simView : Signal.Address Action -> (ID, Sim.Simulation)  -> Html
-simView address (id, sim) = Sim.view (Signal.forwardTo address (Modify id)) sim
+simView : Signal.Address Action -> (ID, ViewState, Sim.Simulation)  -> Html
+simView address (id, viewState, sim) = Sim.view (Signal.forwardTo address (Modify id)) sim
 
 view : Signal.Address Action -> Model -> Html
 view address model =

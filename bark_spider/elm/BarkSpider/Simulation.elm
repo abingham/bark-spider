@@ -58,11 +58,10 @@ update action model =
       SetHidden h ->
         {model | hidden = h}
 
-      Delete -> -- TODO: Not sure. Probably handle elsewhere. See https://github.com/evancz/elm-architecture-tutorial/tree/master/examples/3
-        model
-
       SetParameter a ->
         {model | parameters = updateParameters a model.parameters}
+
+      _ -> model
 
 view : Signal.Address Action -> Simulation -> Html
 view address sim =
