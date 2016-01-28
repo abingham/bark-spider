@@ -81,6 +81,13 @@ mainRow address sim =
         ]
     ]
 
+paramBlock : Html
+paramBlock =
+  text "PARAM BLOCK"
+
 view : Signal.Address Action -> Simulation -> Html
 view address sim =
-  div [] [ mainRow address sim ]
+  let
+    html = [ mainRow address sim ] ++ if sim.hidden then [] else [ paramBlock ]
+  in
+    div [] html
