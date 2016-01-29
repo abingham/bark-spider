@@ -83,7 +83,14 @@ mainRow address sim =
 
 paramBlock : Html
 paramBlock =
-  text "PARAM BLOCK"
+  div [ class "parameter-set-form" ]
+  [ row_
+      [ colSm_ 4 4
+          [ label [class "control-label pull-right"] [text "Assimilation delay (days)"] ]
+      , colSm_ 8 8
+          [ input [class "form-control pull-right", type' "number", Html.Attributes.min "0", value "20"] [] ]
+      ]
+  ]
 
 view : Signal.Address Action -> Simulation -> Html
 view address sim =
