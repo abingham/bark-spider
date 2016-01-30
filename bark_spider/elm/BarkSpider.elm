@@ -56,7 +56,7 @@ updateModify id action model =
       else
         (simId, viewState, sim)
     matchId (simId, viewState, sim) = simId == id
-    sims = 
+    sims =
       case action of
         Sim.Delete ->
           removeWhen matchId model.simulations
@@ -99,7 +99,7 @@ view address model =
     , stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"
     , script "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"
     , row_
-        [colMd_ 4 4 4
+        [colMd_ 12 12 12
            [ h1 [] [text "Simulation Parameters"]
            , row_
                [ colMd_ 12 12 12
@@ -108,10 +108,6 @@ view address model =
                    ]
                ]
            , div [] (List.map (simView address) model.simulations)
-           ]
-        , colMd_ 6 6 6
-           [ text "emus"
-           , text "platypuses...platypi? Not sure."
            ]
         ]
     ]
