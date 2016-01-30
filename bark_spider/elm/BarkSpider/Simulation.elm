@@ -90,6 +90,21 @@ paramBlock =
       , colSm_ 8 8
           [ input [class "form-control pull-right", type' "number", Html.Attributes.min "0", value "20"] [] ]
       ]
+
+  , row_
+      [ colSm_ 4 4
+          [ label [class "control-label pull-right"] [text "Training overhead (0-1)"] ]
+      , colSm_ 8 8
+          [ input [class "form-control pull-right", type' "number", Html.Attributes.min "0", Html.Attributes.max "1", value "1"] [] ]
+      ]
+  , row_
+      [ colSm_ 12 12
+         [ label [ class "control-label" ] [ text "Interventions" ] ]
+      ]
+  , row_
+      [ colSm_ 12 12
+          [ textarea [ class "form-control" ] [] ]
+      ]
   ]
 
 view : Signal.Address Action -> Simulation -> Html
