@@ -73,7 +73,7 @@ addSimulation model =
     viewState = { opened = True }
   in
     { model |
-      simulations = (model.next_id, viewState, sim) :: model.simulations
+      simulations = model.simulations ++ [ (model.next_id, viewState, sim) ]
     , next_id = model.next_id + 1
     }
 
