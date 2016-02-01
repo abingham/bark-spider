@@ -160,18 +160,19 @@ interventionsControls address sim =
       ]
     ]
 
-mainRow : Signal.Address Action -> Simulation -> Html
+mainRow : Signal.Address Action -> Simulation -> List Html
 mainRow address sim =
-  row_
-  [ div
-      [class "input-group"]
-      [ hideButton address sim
-      , nameControls address sim
-      , controlButtons address sim
+  [ row_
+      [ div
+          [class "input-group"]
+          [ hideButton address sim
+          , nameControls address sim
+          , controlButtons address sim
+          ]
       ]
   ]
 
-paramBlock : Signal.Address Action -> Simulation -> Html
+paramBlock : Signal.Address Action -> Simulation -> List Html
 paramBlock address sim =
   let
     html =
@@ -179,13 +180,17 @@ paramBlock address sim =
       , trainingOverheadControls address sim
       , interventionsControls address sim
       ]
+    result =
+      [ div [ class "parameter-set-form" ] (List.concat html) ]
   in
-    div [ class "parameter-set-form" ]
-        (List.concat html)
+    if sim.hidden then [] else result
+
 
 view : Signal.Address Action -> Simulation -> Html
 view address sim =
   let
-    html = [ mainRow address sim ] ++ if sim.hidden then [] else [ paramBlock address sim ]
+    html = List.concat [ mainRow address sim
+                       , paramBlock address sim
+                       ]
   in
     div [] html
