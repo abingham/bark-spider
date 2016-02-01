@@ -99,43 +99,65 @@ controlButtons address sim =
       , btnDefault' "" delete_text address Delete
       ]
 
-assimilationDelayControls : Signal.Address Action -> Simulation -> Html
+assimilationDelayControls : Signal.Address Action -> Simulation -> List Html
 assimilationDelayControls address sim =
   let
     sendSignal = String.toInt >> Result.withDefault 0 >> SetAssimilationDelay >> SetParameter >> Signal.message address
   in
-    row_
-    [ colSm_ 4 4
-        [ label [class "control-label pull-right"] [text "Assimilation delay (days)"] ]
-    , colSm_ 8 8
-        [ input [class "form-control pull-right"
-                , type' "number"
-                , Html.Attributes.min "0"
-                , value (toString sim.parameters.assimilation_delay)
-                , on "input" targetValue sendSignal
-                ]
-            []
+    [ row_
+        [ colSm_ 4 4
+            [ label [class "control-label pull-right"] [text "Assimilation delay (days)"] ]
+        , colSm_ 8 8
+            [ input [class "form-control pull-right"
+                    , type' "number"
+                    , Html.Attributes.min "0"
+                    , value (toString sim.parameters.assimilation_delay)
+                    , on "input" targetValue sendSignal
+                    ]
+                []
+            ]
         ]
     ]
 
-trainingOverheadControls : Signal.Address Action -> Simulation -> Html
+trainingOverheadControls : Signal.Address Action -> Simulation -> List Html
 trainingOverheadControls address sim =
   let
     sendSignal = String.toFloat >> Result.withDefault 0 >> SetTrainingOverheadProportion >> SetParameter >> Signal.message address
   in
-    row_
-    [ colSm_ 4 4
-        [ label [ class "control-label pull-right"] [text "Training overhead (0-1)" ] ]
-    , colSm_ 8 8
-        [ input [ class "form-control pull-right"
-                , type' "number"
-                , Html.Attributes.min "0"
-                , Html.Attributes.max "1"
-                , value "1"
-                , on "input" targetValue sendSignal
-                ]
-            []
+    [ row_
+        [ colSm_ 4 4
+            [ label [ class "control-label pull-right"] [text "Training overhead (0-1)" ] ]
+        , colSm_ 8 8
+            [ input [ class "form-control pull-right"
+                    , type' "number"
+                    , Html.Attributes.min "0"
+                    , Html.Attributes.max "1"
+                    , value "1"
+                    , on "input" targetValue sendSignal
+                    ]
+                []
+            ]
         ]
+    ]
+
+interventionsControls : Signal.Address Action -> Simulation -> List Html
+interventionsControls address sim =
+  let
+    sendSignal = SetInterventions >> SetParameter >> Signal.message address
+  in
+    [ row_
+      [ colSm_ 12 12
+          [ label [ class "control-label" ] [ text "Interventions" ] ]
+      ]
+  , row_
+      [ colSm_ 12 12
+          [ textarea
+              [ class "form-control"
+              , on "input" targetValue sendSignal
+              ]
+              []
+          ]
+      ]
     ]
 
 mainRow : Signal.Address Action -> Simulation -> Html
@@ -151,18 +173,15 @@ mainRow address sim =
 
 paramBlock : Signal.Address Action -> Simulation -> Html
 paramBlock address sim =
-  div [ class "parameter-set-form" ]
-  [ assimilationDelayControls address sim
-  , trainingOverheadControls address sim
-  , row_
-      [ colSm_ 12 12
-         [ label [ class "control-label" ] [ text "Interventions" ] ]
+  let
+    html =
+      [ assimilationDelayControls address sim
+      , trainingOverheadControls address sim
+      , interventionsControls address sim
       ]
-  , row_
-      [ colSm_ 12 12
-          [ textarea [ class "form-control" ] [] ]
-      ]
-  ]
+  in
+    div [ class "parameter-set-form" ]
+        (List.concat html)
 
 view : Signal.Address Action -> Simulation -> Html
 view address sim =
