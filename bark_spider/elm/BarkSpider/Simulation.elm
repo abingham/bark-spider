@@ -4,6 +4,7 @@ import Bootstrap.Html exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import String
 
 type alias Parameters =
   { assimilation_delay : Int
@@ -69,38 +70,69 @@ update action model =
 
       _ -> model
 
-mainRow : Signal.Address Action -> Simulation -> Html
-mainRow address sim =
+hideButton : Signal.Address Action -> Simulation -> Html
+hideButton address sim =
   let
     icon = { btnParam | icon = Just (glyphiconChevronDown' "") }
+  in
+    span
+      [ class "input-group-btn" ]
+      [ btnDefault' "form-control" icon address (SetHidden (not sim.hidden)) ]
+
+nameControls : Signal.Address Action -> Simulation -> Html
+nameControls address sim =
+  input [ type' "text"
+        , class "form-control"
+        , value sim.name
+        , on "input" targetValue (Signal.message address <<  SetName)]
+    []
+
+controlButtons : Signal.Address Action -> Simulation -> Html
+controlButtons address sim =
+  let
     included_text = { btnParam | label = Just (if sim.included then "exclude" else "include") }
     delete_text = { btnParam | label = Just "delete" }
   in
+    div
+      [ class "input-group-btn"]
+      [ btnDefault' "" included_text address (SetIncluded (not sim.included))
+      , btnDefault' "" delete_text address Delete
+      ]
+
+assimilationDelayControls : Signal.Address Action -> Simulation -> Html
+assimilationDelayControls address sim =
+  let
+    sendSignal = String.toInt >> Result.withDefault 0 >> SetAssimilationDelay >> SetParameter >> Signal.message address
+  in
     row_
-    [ div [class "input-group"]
-        [ span [ class "input-group-btn" ] [ btnDefault' "form-control" icon address (SetHidden (not sim.hidden)) ] -- this toggles visibility of sim details
-        , input [ type' "text"
-                , class "form-control"
-                , value sim.name
-                , on "input" targetValue (Signal.message address <<  SetName)]
+    [ colSm_ 4 4
+        [ label [class "control-label pull-right"] [text "Assimilation delay (days)"] ]
+    , colSm_ 8 8
+        [ input [class "form-control pull-right"
+                , type' "number"
+                , Html.Attributes.min "0"
+                , value (toString sim.parameters.assimilation_delay)
+                , on "input" targetValue sendSignal
+                ]
             []
-        , div [ class "input-group-btn"]
-            [ btnDefault' "" included_text address (SetIncluded (not sim.included))
-            , btnDefault' "" delete_text address Delete
-            ]
         ]
     ]
 
-paramBlock : Html
-paramBlock =
-  div [ class "parameter-set-form" ]
-  [ row_
-      [ colSm_ 4 4
-          [ label [class "control-label pull-right"] [text "Assimilation delay (days)"] ]
-      , colSm_ 8 8
-          [ input [class "form-control pull-right", type' "number", Html.Attributes.min "0", value "20"] [] ]
+mainRow : Signal.Address Action -> Simulation -> Html
+mainRow address sim =
+  row_
+  [ div
+      [class "input-group"]
+      [ hideButton address sim
+      , nameControls address sim
+      , controlButtons address sim
       ]
+  ]
 
+paramBlock : Signal.Address Action -> Simulation -> Html
+paramBlock address sim =
+  div [ class "parameter-set-form" ]
+  [ assimilationDelayControls address sim
   , row_
       [ colSm_ 4 4
           [ label [class "control-label pull-right"] [text "Training overhead (0-1)"] ]
@@ -120,6 +152,6 @@ paramBlock =
 view : Signal.Address Action -> Simulation -> Html
 view address sim =
   let
-    html = [ mainRow address sim ] ++ if sim.hidden then [] else [ paramBlock ]
+    html = [ mainRow address sim ] ++ if sim.hidden then [] else [ paramBlock address sim ]
   in
     div [] html
