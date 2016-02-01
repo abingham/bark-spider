@@ -31,8 +31,7 @@ type alias Model =
 createModel : Model
 createModel =
   let
-    params = {assimilation_delay = 20, training_overhead_proportion = 0.2, interventions = ""}
-    sim = {name = "sim1", included = True, hidden = False, parameters = params}
+    sim = Sim.createSimulation "unnamed"
   in
     { simulations = [(0, {opened = True}, sim)]
     , error_messages = []
@@ -45,6 +44,7 @@ createModel =
 
 type Action
   = Modify ID Sim.Action
+  | AddSimulation
   | Null
 
 updateModify : ID -> Sim.Action -> Model -> Model
@@ -66,6 +66,17 @@ updateModify id action model =
   in
     {model | simulations = sims}
 
+addSimulation : Model -> Model
+addSimulation model =
+  let
+    sim = Sim.createSimulation "unnamed"
+    viewState = { opened = True }
+  in
+    { model |
+      simulations = (model.next_id, viewState, sim) :: model.simulations
+    , next_id = model.next_id + 1
+    }
+
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   let
@@ -73,6 +84,9 @@ update action model =
       case action of
         Modify index action ->
           updateModify index action model
+
+        AddSimulation ->
+          addSimulation model
 
         Null ->
           model
@@ -103,7 +117,7 @@ view address model =
            [ h1 [] [text "Simulation Parameters"]
            , row_
                [ colMd_ 12 12 12
-                   [ btnDefault' "" {btnParam | label = Just "Add parameter set"} address Null
+                   [ btnDefault' "" {btnParam | label = Just "Add parameter set"} address AddSimulation
                    , btnDefault' "pull-right" {btnParam | label = Just "Run simulation"} address Null
                    ]
                ]
