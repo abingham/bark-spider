@@ -118,6 +118,26 @@ assimilationDelayControls address sim =
         ]
     ]
 
+trainingOverheadControls : Signal.Address Action -> Simulation -> Html
+trainingOverheadControls address sim =
+  let
+    sendSignal = String.toFloat >> Result.withDefault 0 >> SetTrainingOverheadProportion >> SetParameter >> Signal.message address
+  in
+    row_
+    [ colSm_ 4 4
+        [ label [ class "control-label pull-right"] [text "Training overhead (0-1)" ] ]
+    , colSm_ 8 8
+        [ input [ class "form-control pull-right"
+                , type' "number"
+                , Html.Attributes.min "0"
+                , Html.Attributes.max "1"
+                , value "1"
+                , on "input" targetValue sendSignal
+                ]
+            []
+        ]
+    ]
+
 mainRow : Signal.Address Action -> Simulation -> Html
 mainRow address sim =
   row_
@@ -133,12 +153,7 @@ paramBlock : Signal.Address Action -> Simulation -> Html
 paramBlock address sim =
   div [ class "parameter-set-form" ]
   [ assimilationDelayControls address sim
-  , row_
-      [ colSm_ 4 4
-          [ label [class "control-label pull-right"] [text "Training overhead (0-1)"] ]
-      , colSm_ 8 8
-          [ input [class "form-control pull-right", type' "number", Html.Attributes.min "0", Html.Attributes.max "1", value "1"] [] ]
-      ]
+  , trainingOverheadControls address sim
   , row_
       [ colSm_ 12 12
          [ label [ class "control-label" ] [ text "Interventions" ] ]
