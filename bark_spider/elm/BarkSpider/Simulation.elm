@@ -132,7 +132,8 @@ trainingOverheadControls address sim =
                     , type' "number"
                     , Html.Attributes.min "0"
                     , Html.Attributes.max "1"
-                    , value "1"
+                    , Html.Attributes.step "0.01"
+                    , value (toString sim.parameters.training_overhead_proportion)
                     , on "input" targetValue sendSignal
                     ]
                 []
