@@ -3,6 +3,7 @@ module BarkSpider.Simulation where
 import Bootstrap.Html exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 type alias Parameters =
   { assimilation_delay : Int
@@ -78,7 +79,11 @@ mainRow address sim =
     row_
     [ div [class "input-group"]
         [ span [ class "input-group-btn" ] [ btnDefault' "form-control" icon address (SetHidden (not sim.hidden)) ] -- this toggles visibility of sim details
-        , input [ type' "text", class "form-control", value sim.name ] [] -- How do we update sim.name when this value changes?
+        , input [ type' "text"
+                , class "form-control"
+                , value sim.name
+                , on "input" targetValue (Signal.message address <<  SetName)]
+            []
         , div [ class "input-group-btn"]
             [ btnDefault' "" included_text address (SetIncluded (not sim.included))
             , btnDefault' "" delete_text address Delete
