@@ -3,7 +3,9 @@ module BarkSpider where
 import Effects exposing (Effects)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Http
 import List
+import Task
 
 import StartApp
 
@@ -24,6 +26,7 @@ type alias ViewState =
 
 type alias Model =
   { simulations : List (ID, ViewState, Sim.Simulation)
+  , results : String
   , error_messages : List String
   , next_id : Int
   }
@@ -34,6 +37,7 @@ createModel =
     sim = Sim.createSimulation "unnamed"
   in
     { simulations = [(0, {opened = True}, sim)]
+    , results = ""
     , error_messages = []
     , next_id = 1
     }
@@ -45,6 +49,8 @@ createModel =
 type Action
   = Modify ID Sim.Action
   | AddSimulation
+  | RunSimulation
+  | NewResults (Maybe String)
   | Null
 
 updateModify : ID -> Sim.Action -> Model -> Model
@@ -77,21 +83,40 @@ addSimulation model =
     , next_id = model.next_id + 1
     }
 
+runSimulation : Model -> Model
+runSimulation model =
+  { model |
+      results = ""
+  }
+
+getSimulationResults : Model -> Effects Action
+getSimulationResults model =
+  Http.getString "http://sixty-north.com/c/t.txt"
+    |> Task.toMaybe
+    |> Task.map NewResults
+    |> Effects.task
+
 update : Action -> Model -> (Model, Effects Action)
 update action model =
-  let
-    m =
-      case action of
-        Modify index action ->
-          updateModify index action model
+  case action of
+    Modify index action ->
+      noFx <| updateModify index action model
 
-        AddSimulation ->
-          addSimulation model
+    AddSimulation ->
+      noFx <| addSimulation model
 
-        Null ->
-          model
-  in
-    noFx m
+    RunSimulation ->
+      ( runSimulation model
+      , getSimulationResults model
+      )
+
+    NewResults maybeData ->
+      noFx <| { model |
+                  results = (Maybe.withDefault "[no results]" maybeData)
+              }
+
+    Null ->
+      noFx <| model
 
 --
 -- view
@@ -118,10 +143,16 @@ view address model =
            , row_
                [ colMd_ 12 12 12
                    [ btnDefault' "" {btnParam | label = Just "Add parameter set"} address AddSimulation
-                   , btnDefault' "pull-right" {btnParam | label = Just "Run simulation"} address Null
+                   , btnDefault' "pull-right" {btnParam | label = Just "Run simulation"} address RunSimulation
                    ]
                ]
            , div [] (List.map (simView address) model.simulations)
+           ]
+        ]
+    , row_
+        [colMd_ 12 12 12
+           [ text model.results
+           , text "llamas were here!"
            ]
         ]
     ]
