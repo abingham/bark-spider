@@ -1,74 +1,12 @@
-module BarkSpider.Simulation where
+module BarkSpider.Simulation.View where
 
+import BarkSpider.Simulation.Actions exposing (..)
+import BarkSpider.Simulation.Model exposing (..)
 import Bootstrap.Html exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String
-
-type alias Parameters =
-  { assimilation_delay : Int
-  , training_overhead_proportion : Float
-  , interventions : String
-  }
-
-type alias Simulation =
-  { name : String
-  , included : Bool
-  , parameters : Parameters
-  , hidden : Bool
-}
-
-createSimulation : String -> Simulation
-createSimulation name =
-  let
-    params = {assimilation_delay = 20, training_overhead_proportion = 0.2, interventions = ""}
-  in
-    {name = name, included = True, hidden = False, parameters = params}
-
-type ParameterAction
-  = SetAssimilationDelay Int
-  | SetTrainingOverheadProportion Float
-  | SetInterventions String
-
-updateParameters : ParameterAction -> Parameters -> Parameters
-updateParameters action params =
-  case action of
-    SetAssimilationDelay d ->
-      {params | assimilation_delay = d}
-
-    SetTrainingOverheadProportion p ->
-      {params | training_overhead_proportion = p}
-
-    SetInterventions i ->
-      {params | interventions = i}
-
-type Action
-  = SetName String
-  | SetIncluded Bool
-  | SetHidden Bool
-  | SetParameter ParameterAction
-  | Delete
-
-update : Action -> Simulation -> Simulation
-update action model =
-  let
-    parameters = model.parameters
-  in
-    case action of
-      SetName n ->
-        {model | name = n}
-
-      SetIncluded i ->
-        {model | included = i}
-
-      SetHidden h ->
-        {model | hidden = h}
-
-      SetParameter a ->
-        {model | parameters = updateParameters a model.parameters}
-
-      _ -> model
 
 hideButton : Signal.Address Action -> Simulation -> Html
 hideButton address sim =

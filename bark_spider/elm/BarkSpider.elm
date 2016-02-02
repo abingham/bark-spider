@@ -1,6 +1,9 @@
 module BarkSpider where
 
-import BarkSpider.Simulation as Sim
+import BarkSpider.Simulation.Actions as SimActions
+import BarkSpider.Simulation.Model exposing (createSimulation, Simulation)
+import BarkSpider.Simulation.Update as SimUpdate
+import BarkSpider.Simulation.View as SimView
 import Bootstrap.Html exposing (..)
 import Effects exposing (Effects, Never)
 import Html exposing (..)
@@ -21,7 +24,7 @@ import Task
 type alias ID = Int
 
 type alias Model =
-  { simulations : List (ID, Sim.Simulation)
+  { simulations : List (ID, Simulation)
   , results : String
   , error_messages : List String
   , next_id : Int
@@ -30,7 +33,7 @@ type alias Model =
 createModel : Model
 createModel =
   let
-    sim = Sim.createSimulation "unnamed"
+    sim = createSimulation "unnamed"
   in
     { simulations = []
     , results = ""
@@ -43,23 +46,23 @@ createModel =
 --
 
 type Action
-  = Modify ID Sim.Action
+  = Modify ID SimActions.Action
   | AddSimulation
   | RunSimulation
   | NewResults (Result Http.Error String)
 
-updateModify : ID -> Sim.Action -> Model -> Model
+updateModify : ID -> SimActions.Action -> Model -> Model
 updateModify id action model =
   let
     modifySimulation (simId, sim) =
       if simId == id then
-        (simId, Sim.update action sim)
+        (simId, SimUpdate.update action sim)
       else
         (simId, sim)
     matchId (simId, sim) = simId == id
     sims =
       case action of
-        Sim.Delete ->
+        SimActions.Delete ->
           removeWhen matchId model.simulations
 
         _ ->
@@ -70,7 +73,7 @@ updateModify id action model =
 addSimulation : Model -> Model
 addSimulation model =
   let
-    sim = Sim.createSimulation "unnamed"
+    sim = createSimulation "unnamed"
   in
     { model |
       simulations = model.simulations ++ [ (model.next_id, sim) ]
@@ -140,8 +143,8 @@ stylesheet url = node "link" [ rel "stylesheet", href url] []
 script : String -> Html
 script url = node "script" [src url] []
 
-simView : Signal.Address Action -> (ID, Sim.Simulation)  -> Html
-simView address (id, sim) = Sim.view (Signal.forwardTo address (Modify id)) sim
+simView : Signal.Address Action -> (ID, Simulation)  -> Html
+simView address (id, sim) = SimView.view (Signal.forwardTo address (Modify id)) sim
 
 view : Signal.Address Action -> Model -> Html
 view address model =
