@@ -96,12 +96,16 @@ getSimulationResults model =
   --   1. Find all parameters sets which are "included"
   --   2. Fetch results for each one individually
   --   3. When they all arrive, update the chart/UI.
-  Http.Extra.get "http://sixty-north.com/c/t.txt"
-    |> Http.Extra.send (Json.Decode.list Json.Decode.string)
-    |> (\t -> Task.onError t (\err -> Task.succeed [toString err]))
-    |> Task.toMaybe
-    |> Task.map NewResults
-    |> Effects.task
+  let
+    convertError err = Task.succeed [ toString err ]
+    handleError err = Task.onError err convertError
+  in
+    Http.Extra.get "http://sixty-north.com/c/t.txt"
+      |> Http.Extra.send (Json.Decode.list Json.Decode.string)
+      |> handleError
+      |> Task.toMaybe
+      |> Task.map NewResults
+      |> Effects.task
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
