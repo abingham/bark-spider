@@ -51,7 +51,6 @@ type Action
   | AddSimulation
   | RunSimulation
   | NewResults (Maybe String)
-  | Null
 
 updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
@@ -118,9 +117,6 @@ update action model =
       noFx <| { model |
                   results = (Maybe.withDefault "[no results]" maybeData)
               }
-
-    Null ->
-      noFx <| model
 
 --
 -- view
