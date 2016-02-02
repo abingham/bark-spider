@@ -3,7 +3,7 @@ import json
 import multiprocessing.pool
 
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
-from pyramid.response import Response
+from pyramid.response import FileResponse, Response
 from pyramid.view import view_config
 
 
@@ -31,6 +31,14 @@ def _async_simulation(params, timeout=5):
 @view_config(route_name='home', renderer='templates/main_plot.pt')
 def main_plot(request):
     return {'project': 'bark_spider'}
+
+
+@view_config(route_name='elm')
+def main_plot_in_elm(request):
+    response = FileResponse('bark_spider/elm/index.html',
+                            request=request,
+                            content_type='text/html')
+    return response
 
 
 @view_config(route_name='simulate',
