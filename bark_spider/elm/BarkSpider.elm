@@ -1,6 +1,6 @@
 module BarkSpider where
 
-import Effects exposing (Effects)
+import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
@@ -91,6 +91,10 @@ runSimulation model =
 
 getSimulationResults : Model -> Effects Action
 getSimulationResults model =
+  -- TODO: Obviously this is just a placeholder. We need to:
+  --   1. Find all parameters sets which are "included"
+  --   2. Fetch results for each one individually
+  --   3. When they all arrive, update the chart/UI.
   Http.getString "http://sixty-north.com/c/t.txt"
     |> Task.toMaybe
     |> Task.map NewResults
@@ -178,3 +182,6 @@ app = StartApp.start
 
 main : Signal Html
 main = app.html
+
+port tasks : Signal (Task.Task Never ())
+port tasks = app.tasks
