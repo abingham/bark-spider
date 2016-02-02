@@ -6,7 +6,6 @@ import Html.Attributes exposing (..)
 import Http.Extra
 import Json.Decode
 import List
-import String
 import Task
 
 import StartApp
@@ -28,7 +27,7 @@ type alias ViewState =
 
 type alias Model =
   { simulations : List (ID, ViewState, Sim.Simulation)
-  , results : List String
+  , results : String
   , error_messages : List String
   , next_id : Int
   }
@@ -39,7 +38,7 @@ createModel =
     sim = Sim.createSimulation "unnamed"
   in
     { simulations = [(0, {opened = True}, sim)]
-    , results = []
+    , results = ""
     , error_messages = []
     , next_id = 1
     }
@@ -52,7 +51,7 @@ type Action
   = Modify ID Sim.Action
   | AddSimulation
   | RunSimulation
-  | NewResults (Maybe (List String))
+  | NewResults (Maybe String)
 
 updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
@@ -87,7 +86,7 @@ addSimulation model =
 runSimulation : Model -> Model
 runSimulation model =
   { model |
-      results = []
+      results = ""
   }
 
 getSimulationResults : Model -> Effects Action
@@ -97,12 +96,21 @@ getSimulationResults model =
   --   2. Fetch results for each one individually
   --   3. When they all arrive, update the chart/UI.
   let
-    convertError err = Task.succeed [ toString err ]
-    handleError err = Task.onError err convertError
+    convertError = flip Task.onError <| Task.succeed << toString
+    url = "http://ip.jsontest.com/"
   in
-    Http.Extra.get "http://sixty-north.com/c/t.txt"
-      |> Http.Extra.send (Json.Decode.list Json.Decode.string)
-      |> handleError
+    Http.Extra.get url
+      -- fetch JSON data. It's a dict of strings, hence the parser
+      |> Http.Extra.send (Json.Decode.dict Json.Decode.string)
+
+      -- Convert the dict of strings to just a string
+      |> Task.map toString
+
+      -- If the task actually failed, conver the error to a string and call it
+      -- all a success
+      |> convertError
+
+      -- Turn it into a Task never (Maybe String)
       |> Task.toMaybe
       |> Task.map NewResults
       |> Effects.task
@@ -123,7 +131,7 @@ update action model =
 
     NewResults maybeData ->
       noFx <| { model |
-                  results = (Maybe.withDefault ["[no results]" ] maybeData)
+                  results = (Maybe.withDefault "[no results]" maybeData)
               }
 
 --
@@ -159,8 +167,7 @@ view address model =
         ]
     , row_
         [colMd_ 12 12 12
-           [ text (String.join "<br>" model.results)
-           , text "llamas were here!"
+           [ text model.results
            ]
         ]
     ]
