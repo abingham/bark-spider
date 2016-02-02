@@ -1,19 +1,18 @@
 module BarkSpider where
 
+import BarkSpider.Simulation as Sim
+import Bootstrap.Html exposing (..)
 import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Http
 import Http.Extra
 import Json.Decode
 import List
-import Task
-
+import List.Extra exposing (removeWhen)
 import StartApp
-
-import Bootstrap.Html exposing (..)
-import List.Extra exposing (getAt, removeWhen)
-
-import BarkSpider.Simulation as Sim
+import String
+import Task
 
 --
 -- model
@@ -51,7 +50,7 @@ type Action
   = Modify ID Sim.Action
   | AddSimulation
   | RunSimulation
-  | NewResults (Maybe String)
+  | NewResults (Result Http.Error String)
 
 updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
@@ -106,12 +105,8 @@ getSimulationResults model =
       -- Convert the dict of strings to just a string
       |> Task.map toString
 
-      -- If the task actually failed, conver the error to a string and call it
-      -- all a success
-      |> convertError
-
-      -- Turn it into a Task never (Maybe String)
-      |> Task.toMaybe
+      -- Turn it into a Result
+      |> Task.toResult
       |> Task.map NewResults
       |> Effects.task
 
@@ -129,10 +124,16 @@ update action model =
       , getSimulationResults model
       )
 
-    NewResults maybeData ->
-      noFx <| { model |
-                  results = (Maybe.withDefault "[no results]" maybeData)
+    NewResults (Ok value) ->
+      noFx <| { model
+                | results = String.append model.results value
               }
+
+    NewResults (Err error) ->
+      noFx <| { model
+                | error_messages = (toString error) :: model.error_messages
+              }
+
 
 --
 -- view
