@@ -5,12 +5,13 @@ import BarkSpider.Simulation.Model exposing (createSimulation, Simulation)
 import BarkSpider.Simulation.Update as SimUpdate
 import BarkSpider.Simulation.View as SimView
 import Bootstrap.Html exposing (..)
-import Effects exposing (Effects, Never)
+import Effects exposing (batch, Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Http.Extra
 import Json.Decode
+import Json.Encode
 import List
 import List.Extra exposing (removeWhen)
 import StartApp
@@ -29,6 +30,21 @@ type alias Model =
   , error_messages : List String
   , next_id : Int
   }
+
+simulationToJson : Simulation -> Json.Encode.Value
+simulationToJson sim =
+  let
+    params = sim.parameters
+    params_obj = Json.Encode.object
+                 [ ("assimilation_delay", Json.Encode.int params.assimilation_delay)
+                 , ("training_overhead_proportion", Json.Encode.float params.training_overhead_proportion)
+                 , ("interventions", Json.Encode.string params.interventions)
+                 ]
+  in
+    Json.Encode.object
+          [ ("name", Json.Encode.string sim.name)
+          , ("parameters", params_obj)
+          ]
 
 createModel : Model
 createModel =
@@ -80,24 +96,22 @@ addSimulation model =
     , next_id = model.next_id + 1
     }
 
-runSimulation : Model -> Model
-runSimulation model =
+clearSimulationResults : Model -> Model
+clearSimulationResults model =
   { model |
       results = ""
   }
 
-getSimulationResults : Model -> Effects Action
-getSimulationResults model =
-  -- TODO: Obviously this is just a placeholder. We need to:
-  --   1. Find all parameters sets which are "included"
-  --   2. Fetch results for each one individually
-  --   3. When they all arrive, update the chart/UI.
+requestSimulation : Simulation -> Effects Action
+requestSimulation sim =
   let
     convertError = flip Task.onError <| Task.succeed << toString
-    url = "http://ip.jsontest.com/"
+    url = "/simulate"
   in
-    Http.Extra.get url
-      -- fetch JSON data. It's a dict of strings, hence the parser
+    Http.Extra.post url
+      |> Http.Extra.withBody (Http.string (Json.Encode.encode 2 (simulationToJson sim)))
+      |> Http.Extra.withHeader ("Content-Type", "application/json")
+
       |> Http.Extra.send (Json.Decode.dict Json.Decode.string)
 
       -- Convert the dict of strings to just a string
@@ -107,6 +121,14 @@ getSimulationResults model =
       |> Task.toResult
       |> Task.map NewResults
       |> Effects.task
+
+requestSimulations : Model -> Effects Action
+requestSimulations model =
+  -- TODO: Obviously this is just a placeholder. We need to:
+  --   1. Find all parameters sets which are "included"
+  --   2. Fetch results for each one individually
+  --   3. When they all arrive, update the chart/UI.
+  List.map (snd >> requestSimulation) model.simulations |> batch
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -118,8 +140,8 @@ update action model =
       noFx <| addSimulation model
 
     RunSimulation ->
-      ( runSimulation model
-      , getSimulationResults model
+      ( clearSimulationResults model
+      , requestSimulations model
       )
 
     NewResults (Ok value) ->
