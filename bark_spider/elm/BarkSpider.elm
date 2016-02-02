@@ -1,7 +1,7 @@
 module BarkSpider where
 
 import BarkSpider.Simulation.Actions as SimActions
-import BarkSpider.Simulation.Model exposing (createSimulation, Simulation)
+import BarkSpider.Simulation.Model exposing (createSimulation, simulationToJson, Simulation)
 import BarkSpider.Simulation.Update as SimUpdate
 import BarkSpider.Simulation.View as SimView
 import Bootstrap.Html exposing (..)
@@ -30,21 +30,6 @@ type alias Model =
   , error_messages : List String
   , next_id : Int
   }
-
-simulationToJson : Simulation -> Json.Encode.Value
-simulationToJson sim =
-  let
-    params = sim.parameters
-    params_obj = Json.Encode.object
-                 [ ("assimilation_delay", Json.Encode.int params.assimilation_delay)
-                 , ("training_overhead_proportion", Json.Encode.float params.training_overhead_proportion)
-                 , ("interventions", Json.Encode.string params.interventions)
-                 ]
-  in
-    Json.Encode.object
-          [ ("name", Json.Encode.string sim.name)
-          , ("parameters", params_obj)
-          ]
 
 createModel : Model
 createModel =
