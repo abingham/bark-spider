@@ -20,12 +20,8 @@ import Task
 
 type alias ID = Int
 
-type alias ViewState =
-  { opened : Bool
-  }
-
 type alias Model =
-  { simulations : List (ID, ViewState, Sim.Simulation)
+  { simulations : List (ID, Sim.Simulation)
   , results : String
   , error_messages : List String
   , next_id : Int
@@ -36,10 +32,10 @@ createModel =
   let
     sim = Sim.createSimulation "unnamed"
   in
-    { simulations = [(0, {opened = True}, sim)]
+    { simulations = []
     , results = ""
     , error_messages = []
-    , next_id = 1
+    , next_id = 0
     }
 
 --
@@ -55,12 +51,12 @@ type Action
 updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
   let
-    modifySimulation (simId, viewState, sim) =
+    modifySimulation (simId, sim) =
       if simId == id then
-        (simId, viewState, Sim.update action sim)
+        (simId, Sim.update action sim)
       else
-        (simId, viewState, sim)
-    matchId (simId, viewState, sim) = simId == id
+        (simId, sim)
+    matchId (simId, sim) = simId == id
     sims =
       case action of
         Sim.Delete ->
@@ -75,10 +71,9 @@ addSimulation : Model -> Model
 addSimulation model =
   let
     sim = Sim.createSimulation "unnamed"
-    viewState = { opened = True }
   in
     { model |
-      simulations = model.simulations ++ [ (model.next_id, viewState, sim) ]
+      simulations = model.simulations ++ [ (model.next_id, sim) ]
     , next_id = model.next_id + 1
     }
 
@@ -145,8 +140,8 @@ stylesheet url = node "link" [ rel "stylesheet", href url] []
 script : String -> Html
 script url = node "script" [src url] []
 
-simView : Signal.Address Action -> (ID, ViewState, Sim.Simulation)  -> Html
-simView address (id, viewState, sim) = Sim.view (Signal.forwardTo address (Modify id)) sim
+simView : Signal.Address Action -> (ID, Sim.Simulation)  -> Html
+simView address (id, sim) = Sim.view (Signal.forwardTo address (Modify id)) sim
 
 view : Signal.Address Action -> Model -> Html
 view address model =
