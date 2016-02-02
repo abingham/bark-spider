@@ -3,8 +3,10 @@ module BarkSpider where
 import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Http
+import Http.Extra
+import Json.Decode
 import List
+import String
 import Task
 
 import StartApp
@@ -26,7 +28,7 @@ type alias ViewState =
 
 type alias Model =
   { simulations : List (ID, ViewState, Sim.Simulation)
-  , results : String
+  , results : List String
   , error_messages : List String
   , next_id : Int
   }
@@ -37,7 +39,7 @@ createModel =
     sim = Sim.createSimulation "unnamed"
   in
     { simulations = [(0, {opened = True}, sim)]
-    , results = ""
+    , results = []
     , error_messages = []
     , next_id = 1
     }
@@ -50,7 +52,7 @@ type Action
   = Modify ID Sim.Action
   | AddSimulation
   | RunSimulation
-  | NewResults (Maybe String)
+  | NewResults (Maybe (List String))
 
 updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
@@ -85,7 +87,7 @@ addSimulation model =
 runSimulation : Model -> Model
 runSimulation model =
   { model |
-      results = ""
+      results = []
   }
 
 getSimulationResults : Model -> Effects Action
@@ -94,7 +96,9 @@ getSimulationResults model =
   --   1. Find all parameters sets which are "included"
   --   2. Fetch results for each one individually
   --   3. When they all arrive, update the chart/UI.
-  Http.getString "http://sixty-north.com/c/t.txt"
+  Http.Extra.get "http://sixty-north.com/c/t.txt"
+    |> Http.Extra.send (Json.Decode.list Json.Decode.string)
+    |> (\t -> Task.onError t (\err -> Task.succeed [toString err]))
     |> Task.toMaybe
     |> Task.map NewResults
     |> Effects.task
@@ -115,7 +119,7 @@ update action model =
 
     NewResults maybeData ->
       noFx <| { model |
-                  results = (Maybe.withDefault "[no results]" maybeData)
+                  results = (Maybe.withDefault ["[no results]" ] maybeData)
               }
 
 --
@@ -151,7 +155,7 @@ view address model =
         ]
     , row_
         [colMd_ 12 12 12
-           [ text model.results
+           [ text (String.join "<br>" model.results)
            , text "llamas were here!"
            ]
         ]
