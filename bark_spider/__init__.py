@@ -3,6 +3,7 @@ from pyramid.config import Configurator
 from .routes import configure_routes
 from .simulation_db import SimulationDatabase
 
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
