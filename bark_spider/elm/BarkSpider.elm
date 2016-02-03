@@ -1,5 +1,6 @@
 module BarkSpider where
 
+import BarkSpider.Network
 import BarkSpider.Simulation.Actions as SimActions
 import BarkSpider.Simulation.Model exposing (createSimulation, simulationToJson, Simulation)
 import BarkSpider.Simulation.Update as SimUpdate
@@ -9,9 +10,6 @@ import Effects exposing (batch, Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
-import Http.Extra
-import Json.Decode
-import Json.Encode
 import List
 import List.Extra exposing (removeWhen)
 import StartApp
@@ -100,23 +98,11 @@ clearSimulationResults model =
 
 requestSimulation : Simulation -> Effects Action
 requestSimulation sim =
-  let
-    convertError = flip Task.onError <| Task.succeed << toString
-    url = "/simulate"
-  in
-    Http.Extra.post url
-      |> Http.Extra.withBody (Http.string (Json.Encode.encode 2 (simulationToJson sim)))
-      |> Http.Extra.withHeader ("Content-Type", "application/json")
-
-      |> Http.Extra.send (Json.Decode.dict Json.Decode.string)
-
-      -- Convert the dict of strings to just a string
-      |> Task.map toString
-
-      -- Turn it into a Result
-      |> Task.toResult
-      |> Task.map NewResults
-      |> Effects.task
+  BarkSpider.Network.requestSimulation sim `Task.andThen` BarkSpider.Network.requestSimulationResults
+    |> Task.map toString
+    |> Task.toResult
+    |> Task.map NewResults
+    |> Effects.task
 
 requestSimulations : Model -> Effects Action
 requestSimulations model =
