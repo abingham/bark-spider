@@ -56,15 +56,11 @@ runSimulations model =
     sims =
       List.map snd model.simulations
         |> List.filter .included
-
-    run sim =
-      requestSimulation sim `Task.andThen` requestSimulationResults
-        |> Task.toResult
   in
-  List.map run sims
-    |> Task.sequence
-    |> Task.map NewResults
-    |> Effects.task
+    List.map (requestSimulation >> Task.toResult) sims
+      |> Task.sequence
+      |> Task.map NewResults
+      |> Effects.task
 
 handleNewResult : Result Http.Error SimulationResults -> Model -> Model
 handleNewResult result model =

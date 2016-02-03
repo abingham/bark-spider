@@ -72,8 +72,10 @@ simulationResultsDecoder =
       ("parameters" := parametersDecoder)
       ("results" := Json.Decode.string)
 
-requestSimulation : Simulation -> Task.Task Http.Error RequestResponse
-requestSimulation sim =
+-- Phase 1 of the simulation request. Ask the server to do the simulation and
+-- hand back a results URL/ID.
+simulationToResponse : Simulation -> Task.Task Http.Error RequestResponse
+simulationToResponse sim =
   let
     -- convertError = flip Task.onError <| Task.succeed << toString
     url = Http.url "/simulate" []
@@ -89,11 +91,17 @@ requestSimulation sim =
       -- |> Task.map NewResults
       -- |> Effects.task
 
-requestSimulationResults : RequestResponse -> Task.Task Http.Error SimulationResults
-requestSimulationResults reqResponse =
+-- Phase 2 of the simulation request. Ask the server for the results.
+responseToSimulationResults : RequestResponse -> Task.Task Http.Error SimulationResults
+responseToSimulationResults reqResponse =
   let
     address = String.concat [reqResponse.url, "/", reqResponse.result_id]
     url = Http.url address []
   in
     get url
       |> send simulationResultsDecoder
+
+-- Combine phasese 1 and 2...probably what you want.
+requestSimulation : Simulation -> Task.Task Http.Error SimulationResults
+requestSimulation sim =
+  simulationToResponse sim `Task.andThen` responseToSimulationResults
