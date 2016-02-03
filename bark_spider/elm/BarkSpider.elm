@@ -12,6 +12,7 @@ import Html.Attributes exposing (..)
 import Http
 import List
 import List.Extra exposing (removeWhen)
+import Result
 import StartApp
 import String
 import Task
@@ -56,7 +57,7 @@ type Action
   | RunSimulation
 
   -- simulation results have arrived and should be displayed.
-  | NewResults (Result Http.Error BarkSpider.Network.SimulationResults)
+  | NewResults (List (Result.Result Http.Error BarkSpider.Network.SimulationResults))
 
 updateModify : ID -> SimActions.Action -> Model -> Model
 updateModify id action model =
@@ -93,20 +94,31 @@ clearSimulationResults model =
       results = ""
   }
 
-requestSimulation : Simulation -> Effects Action
+requestSimulation : Simulation -> Task.Task never (Result Http.Error BarkSpider.Network.SimulationResults)
 requestSimulation sim =
   BarkSpider.Network.requestSimulation sim `Task.andThen` BarkSpider.Network.requestSimulationResults
     |> Task.toResult
-    |> Task.map NewResults
-    |> Effects.task
 
 requestSimulations : Model -> Effects Action
 requestSimulations model =
-  -- TODO: Obviously this is just a placeholder. We need to:
-  --   1. Find all parameters sets which are "included"
-  --   2. Fetch results for each one individually
-  --   3. When they all arrive, update the chart/UI.
-  List.map (snd >> requestSimulation) model.simulations |> batch
+  -- TODO: Filter out non-included simulations
+  List.map (snd >> requestSimulation) model.simulations
+    |> Task.sequence
+    |> Task.map NewResults
+    |> Effects.task
+
+handleNewResult : Result.Result Http.Error BarkSpider.Network.SimulationResults -> Model -> Model
+handleNewResult result model =
+  case result of
+    Ok r ->
+      { model
+        | results = String.append model.results (toString r)
+      }
+
+    Err error ->
+      { model
+        | error_messages = (toString error) :: model.error_messages
+      }
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -122,18 +134,8 @@ update action model =
       , requestSimulations model
       )
 
-    NewResults (Ok value) ->
-      noFx <|
-      { model
-        | results = String.append model.results (toString value)
-      }
-
-    NewResults (Err error) ->
-      noFx <|
-      { model
-        | error_messages = (toString error) :: model.error_messages
-      }
-
+    NewResults results ->
+      List.foldl handleNewResult model results |> noFx
 
 --
 -- view
