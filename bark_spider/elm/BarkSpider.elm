@@ -56,7 +56,7 @@ type Action
   | RunSimulation
 
   -- simulation results have arrived and should be displayed.
-  | NewResults (Result Http.Error String)
+  | NewResults (Result Http.Error BarkSpider.Network.SimulationResults)
 
 updateModify : ID -> SimActions.Action -> Model -> Model
 updateModify id action model =
@@ -96,7 +96,6 @@ clearSimulationResults model =
 requestSimulation : Simulation -> Effects Action
 requestSimulation sim =
   BarkSpider.Network.requestSimulation sim `Task.andThen` BarkSpider.Network.requestSimulationResults
-    |> Task.map toString
     |> Task.toResult
     |> Task.map NewResults
     |> Effects.task
@@ -124,14 +123,16 @@ update action model =
       )
 
     NewResults (Ok value) ->
-      noFx <| { model
-                | results = String.append model.results value
-              }
+      noFx <|
+      { model
+        | results = String.append model.results (toString value)
+      }
 
     NewResults (Err error) ->
-      noFx <| { model
-                | error_messages = (toString error) :: model.error_messages
-              }
+      noFx <|
+      { model
+        | error_messages = (toString error) :: model.error_messages
+      }
 
 
 --
