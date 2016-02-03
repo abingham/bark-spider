@@ -47,9 +47,20 @@ createModel =
 --
 
 type Action
+  -- Update the Simulation with the ID
   = Modify ID SimActions.Action
+
+  -- create a new simulation parameter set
   | AddSimulation
+
+  -- send parameter sets to server, requesting simulation. Server responds with
+  -- retrieval IDs.
   | RunSimulation
+
+  -- request simulation results from server
+  | FetchSimulationResults
+
+  -- simulation results have arrived and should be displayed.
   | NewResults (Result Http.Error String)
 
 updateModify : ID -> SimActions.Action -> Model -> Model
@@ -128,6 +139,9 @@ update action model =
       ( clearSimulationResults model
       , requestSimulations model
       )
+
+    FetchSimulationResults ->
+      noFx <| model
 
     NewResults (Ok value) ->
       noFx <| { model
