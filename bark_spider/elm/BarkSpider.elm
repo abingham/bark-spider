@@ -55,9 +55,6 @@ type Action
   -- retrieval IDs.
   | RunSimulation
 
-  -- request simulation results from server
-  | FetchSimulationResults
-
   -- simulation results have arrived and should be displayed.
   | NewResults (Result Http.Error String)
 
@@ -125,9 +122,6 @@ update action model =
       ( clearSimulationResults model
       , requestSimulations model
       )
-
-    FetchSimulationResults ->
-      noFx <| model
 
     NewResults (Ok value) ->
       noFx <| { model
