@@ -97,12 +97,15 @@ clearSimulationResults model =
 runSimulations : Model -> Effects Action
 runSimulations model =
   let
-    run (id, sim) =
+    sims =
+      List.map snd model.simulations
+        |> List.filter .included
+
+    run sim =
       requestSimulation sim `Task.andThen` requestSimulationResults
         |> Task.toResult
   in
-  -- TODO: Filter out non-included simulations
-  List.map run model.simulations
+  List.map run sims
     |> Task.sequence
     |> Task.map NewResults
     |> Effects.task
@@ -124,10 +127,12 @@ update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
     Modify index action ->
-      noFx <| updateModify index action model
+      updateModify index action model
+        |> noFx
 
     AddSimulation ->
-      noFx <| addSimulation model
+      addSimulation model
+        |> noFx
 
     RunSimulation ->
       ( clearSimulationResults model
@@ -135,7 +140,8 @@ update action model =
       )
 
     NewResults results ->
-      List.foldl handleNewResult model results |> noFx
+      List.foldl handleNewResult model results
+        |> noFx
 
 --
 -- view
