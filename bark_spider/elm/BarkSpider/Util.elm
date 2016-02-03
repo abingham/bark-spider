@@ -1,27 +1,32 @@
 module BarkSpider.Util where
 
-setAt : List a -> Int -> a -> Maybe (List a)
-setAt l index value =
-  let
-    head = List.take index l
-    tail = List.drop index l |> List.tail
-  in
-    case tail of
-      Nothing ->
-        Nothing
+import Effects exposing (Effects)
 
-      Just t ->
-        Just (value :: t |> List.append head)
+-- setAt : List a -> Int -> a -> Maybe (List a)
+-- setAt l index value =
+--   let
+--     head = List.take index l
+--     tail = List.drop index l |> List.tail
+--   in
+--     case tail of
+--       Nothing ->
+--         Nothing
 
-removeAt : List a -> Int -> List a
-removeAt l index =
-  let
-    head = List.take index l
-    tail = List.drop index l |> List.tail
-  in
-    case tail of
-      Nothing ->
-        l
+--       Just t ->
+--         Just (value :: t |> List.append head)
 
-      Just t ->
-        List.append head t
+-- removeAt : List a -> Int -> List a
+-- removeAt l index =
+--   let
+--     head = List.take index l
+--     tail = List.drop index l |> List.tail
+--   in
+--     case tail of
+--       Nothing ->
+--         l
+
+--       Just t ->
+--         List.append head t
+
+noFx : model -> (model, Effects a)
+noFx model = (model, Effects.none)
