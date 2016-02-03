@@ -12,40 +12,58 @@ import Json.Encode
 import String
 import Task
 
+-- This is what we get back when we request that a simulation be run
 type alias RequestResponse =
-  { url : String -- TODO: Is there a more official URL type?
-  , result_id : String
+  { url : String       -- The URL at which the results can be fetched
+  , result_id : String -- The ID of the results (append to the url)
   }
 
+-- These are the actual simulation results.
 type alias SimulationResults =
-  { name : String
-  , parameters : String
-  , results : String
+  { name : String        -- Name assigned to the results
+  , parameters : String  -- Parameters used to calculate the results
+  , results : String     -- The results themselves
   }
 
 requestResponseDecoder : Json.Decode.Decoder RequestResponse
 requestResponseDecoder =
   let
-    toResponse url result_id = { url = url, result_id = result_id }
+    toResponse url result_id =
+      { url = url
+      , result_id = result_id
+      }
   in
-    Json.Decode.object2 toResponse ("url" := Json.Decode.string) ("result-id" := Json.Decode.string)
+    Json.Decode.object2
+      toResponse
+      ("url" := Json.Decode.string)
+      ("result-id" := Json.Decode.string)
 
 simulationResultsDecoder : Json.Decode.Decoder SimulationResults
 simulationResultsDecoder =
   let
-    toResults name parameters results = { name = name, parameters = parameters, results = results }
+    toResults name parameters results =
+      { name = name
+      , parameters = parameters
+      , results = results
+      }
   in
-    Json.Decode.object3 toResults ("name" := Json.Decode.string) ("parameters" := Json.Decode.string) ("results" := Json.Decode.string)
+    Json.Decode.object3
+      toResults
+      ("name" := Json.Decode.string)
+      ("parameters" := Json.Decode.string)
+      ("results" := Json.Decode.string)
 
 requestSimulation : Simulation -> Task.Task Http.Error RequestResponse
 requestSimulation sim =
   let
-    convertError = flip Task.onError <| Task.succeed << toString
+    -- convertError = flip Task.onError <| Task.succeed << toString
     url = Http.url "/simulate" []
+    body = (Http.string (Json.Encode.encode 2 (simulationToJson sim)))
+    header = ("Content-Type", "application/json")
   in
     post url
-      |> withBody (Http.string (Json.Encode.encode 2 (simulationToJson sim)))
-      |> withHeader ("Content-Type", "application/json")
+      |> withBody body
+      |> withHeader header
       |> send requestResponseDecoder
 
       -- |> Task.toResult
@@ -55,7 +73,8 @@ requestSimulation sim =
 requestSimulationResults : RequestResponse -> Task.Task Http.Error SimulationResults
 requestSimulationResults reqResponse =
   let
-    url = String.concat [reqResponse.url, "/", reqResponse.result_id] |> (flip Http.url) []
+    address = String.concat [reqResponse.url, "/", reqResponse.result_id]
+    url = Http.url address []
   in
     get url
       |> send simulationResultsDecoder
