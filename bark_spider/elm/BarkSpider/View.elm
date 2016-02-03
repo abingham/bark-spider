@@ -7,6 +7,7 @@ import BarkSpider.Simulation.View as SimView
 import Bootstrap.Html exposing (..)
 import Html exposing (div, Html, h1, node, text)
 import Html.Attributes exposing (href, rel, src)
+import String
 
 stylesheet : String -> Html
 stylesheet url = node "link" [ rel "stylesheet", href url] []
@@ -38,6 +39,7 @@ view address model =
     , row_
         [colMd_ 12 12 12
            [ text model.results
+           , text (String.concat model.error_messages)
            ]
         ]
     ]
