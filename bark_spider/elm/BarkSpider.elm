@@ -1,6 +1,6 @@
 module BarkSpider where
 
-import BarkSpider.Network
+import BarkSpider.Network exposing (requestSimulation, requestSimulationResults, SimulationResults)
 import BarkSpider.Simulation.Actions as SimActions
 import BarkSpider.Simulation.Model exposing (createSimulation, simulationToJson, Simulation)
 import BarkSpider.Simulation.Update as SimUpdate
@@ -12,7 +12,7 @@ import Html.Attributes exposing (..)
 import Http
 import List
 import List.Extra exposing (removeWhen)
-import Result
+import Result exposing (Result)
 import StartApp
 import String
 import Task
@@ -57,7 +57,7 @@ type Action
   | RunSimulation
 
   -- simulation results have arrived and should be displayed.
-  | NewResults (List (Result.Result Http.Error BarkSpider.Network.SimulationResults))
+  | NewResults (List (Result Http.Error SimulationResults))
 
 updateModify : ID -> SimActions.Action -> Model -> Model
 updateModify id action model =
@@ -94,20 +94,20 @@ clearSimulationResults model =
       results = ""
   }
 
-requestSimulation : Simulation -> Task.Task never (Result Http.Error BarkSpider.Network.SimulationResults)
-requestSimulation sim =
-  BarkSpider.Network.requestSimulation sim `Task.andThen` BarkSpider.Network.requestSimulationResults
-    |> Task.toResult
-
-requestSimulations : Model -> Effects Action
-requestSimulations model =
+runSimulations : Model -> Effects Action
+runSimulations model =
+  let
+    run (id, sim) =
+      requestSimulation sim `Task.andThen` requestSimulationResults
+        |> Task.toResult
+  in
   -- TODO: Filter out non-included simulations
-  List.map (snd >> requestSimulation) model.simulations
+  List.map run model.simulations
     |> Task.sequence
     |> Task.map NewResults
     |> Effects.task
 
-handleNewResult : Result.Result Http.Error BarkSpider.Network.SimulationResults -> Model -> Model
+handleNewResult : Result Http.Error SimulationResults -> Model -> Model
 handleNewResult result model =
   case result of
     Ok r ->
@@ -131,7 +131,7 @@ update action model =
 
     RunSimulation ->
       ( clearSimulationResults model
-      , requestSimulations model
+      , runSimulations model
       )
 
     NewResults results ->
