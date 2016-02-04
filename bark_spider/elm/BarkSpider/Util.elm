@@ -1,6 +1,8 @@
-module BarkSpider.Util where
+module BarkSpider.Util (..) where
 
 import Effects exposing (Effects)
 
-noFx : model -> (model, Effects a)
-noFx model = (model, Effects.none)
+
+noFx : model -> ( model, Effects a )
+noFx model =
+  ( model, Effects.none )

@@ -1,20 +1,25 @@
-module BarkSpider.Model where
+module BarkSpider.Model (..) where
 
 import BarkSpider.Simulation.Model exposing (createSimulation, Simulation)
 
-type alias ID = Int
+
+type alias ID =
+  Int
+
 
 type alias Model =
-  { simulations : List (ID, Simulation)
+  { simulations : List ( ID, Simulation )
   , results : String
   , error_messages : List String
   , next_id : Int
   }
 
+
 createModel : Model
 createModel =
   let
-    sim = createSimulation "unnamed"
+    sim =
+      createSimulation "unnamed"
   in
     { simulations = []
     , results = ""

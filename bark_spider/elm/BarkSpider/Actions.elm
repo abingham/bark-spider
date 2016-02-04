@@ -1,20 +1,19 @@
-module BarkSpider.Actions where
+module BarkSpider.Actions (..) where
 
 import BarkSpider.Model
 import BarkSpider.Network
 import BarkSpider.Simulation.Actions
 import Http
 
-type Action
+
+type
+  Action
   -- Update the Simulation with the ID
   = Modify BarkSpider.Model.ID BarkSpider.Simulation.Actions.Action
-
-  -- create a new simulation parameter set
+    -- create a new simulation parameter set
   | AddSimulation
-
-  -- send parameter sets to server, requesting simulation. Server responds with
-  -- retrieval IDs.
+    -- send parameter sets to server, requesting simulation. Server responds with
+    -- retrieval IDs.
   | RunSimulation
-
-  -- simulation results have arrived and should be displayed.
+    -- simulation results have arrived and should be displayed.
   | NewResults (List (Result Http.Error BarkSpider.Network.SimulationResults))

@@ -1,7 +1,8 @@
 -- Functions for requesting simulation execution and results from the server.
 -- This implements the HTTP+JSON protocol that the server uses.
 
-module BarkSpider.Network where
+
+module BarkSpider.Network (..) where
 
 import BarkSpider.Json exposing (..)
 import BarkSpider.Simulation.Model exposing (Parameters, Simulation, simulationToJson)
@@ -13,15 +14,24 @@ import Json.Decode exposing ((:=))
 import Json.Encode
 import Task
 
+
 --
 -- Data types
 --
 
--- This is what we get back when we request that a simulation be run
+
+{-| This is what we get back when we request that a simulation be run
+-}
 type alias RequestResponse =
-  { url : String       -- The URL at which the results can be fetched
-  , result_id : String -- The ID of the results (append to the url)
+  { url :
+      String
+      -- The URL at which the results can be fetched
+  , result_id :
+      String
+      -- The ID of the results (append to the url)
   }
+
+
 
 -- This is what we get back as simulation results:
 --
@@ -31,22 +41,35 @@ type alias RequestResponse =
 --    "elapsed_time": {"<step>": "<elapsed time (int)>", . . .}},
 --  "parameters": {"interventions": "add 100 10", "assimilation_delay": 20, "training_overhead_proportion": 0.25}, "name": "+10 @ 100d"}
 
--- The "data" payload of a simulation
+
+{-| The "data" payload of a simulation
+-}
 type alias SimulationData =
   { software_development_rate : Dict.Dict Int Float
   , elapsed_time : Dict.Dict Int Int
   }
 
--- The top-level simulation results, including metadata, parameters, and data.
+
+{-| The top-level simulation results, including metadata, parameters, and data.
+-}
 type alias SimulationResults =
-  { name : String            -- Name assigned to the results
-  , parameters : Parameters  -- Parameters used to calculate the results
-  , results : SimulationData        -- The results themselves
+  { name :
+      String
+      -- Name assigned to the results
+  , parameters :
+      Parameters
+      -- Parameters used to calculate the results
+  , results :
+      SimulationData
+      -- The results themselves
   }
+
+
 
 --
 -- JSON decoders
 --
+
 
 requestResponseDecoder : Json.Decode.Decoder RequestResponse
 requestResponseDecoder =
@@ -61,6 +84,7 @@ requestResponseDecoder =
       ("url" := Json.Decode.string)
       ("result-id" := Json.Decode.string)
 
+
 parametersDecoder : Json.Decode.Decoder Parameters
 parametersDecoder =
   let
@@ -72,9 +96,10 @@ parametersDecoder =
   in
     Json.Decode.object3
       toParameter
-        ("assimilation_delay" := Json.Decode.int)
-        ("training_overhead_proportion" := Json.Decode.float)
-        ("interventions" := Json.Decode.string)
+      ("assimilation_delay" := Json.Decode.int)
+      ("training_overhead_proportion" := Json.Decode.float)
+      ("interventions" := Json.Decode.string)
+
 
 simulationDataDecoder : Json.Decode.Decoder SimulationData
 simulationDataDecoder =
@@ -88,6 +113,7 @@ simulationDataDecoder =
       toResults
       ("software_development_rate" := Json.Decode.dict stringFloatDecoder)
       ("elapsed_time" := Json.Decode.dict stringIntDecoder)
+
 
 simulationResultsDecoder : Json.Decode.Decoder SimulationResults
 simulationResultsDecoder =
@@ -104,40 +130,52 @@ simulationResultsDecoder =
       ("parameters" := parametersDecoder)
       ("results" := simulationDataDecoder)
 
+
+
 --
 -- HTTP API
 --
 
--- Phase 1 of the simulation request. Ask the server to do the simulation and
--- hand back a results URL/ID.
+
+{-| Phase 1 of the simulation request. Ask the server to do the simulation and
+ hand back a results URL/ID.
+-}
 requestSimulation : Simulation -> Task.Task Http.Error RequestResponse
 requestSimulation sim =
   let
     -- convertError = flip Task.onError <| Task.succeed << toString
-    url = Http.url "/simulate" []
-    body = (Http.string (Json.Encode.encode 2 (simulationToJson sim)))
-    header = ("Content-Type", "application/json")
+    url =
+      Http.url "/simulate" []
+
+    body =
+      (Http.string (Json.Encode.encode 2 (simulationToJson sim)))
+
+    header =
+      ( "Content-Type", "application/json" )
   in
     post url
       |> withBody body
       |> withHeader header
       |> send requestResponseDecoder
 
-      -- |> Task.toResult
-      -- |> Task.map NewResults
-      -- |> Effects.task
 
--- Phase 2 of the simulation request. Ask the server for the results.
+{-| Phase 2 of the simulation request. Ask the server for the results.
+-}
 requestSimulationResults : RequestResponse -> Task.Task Http.Error SimulationResults
 requestSimulationResults reqResponse =
   let
-    address = reqResponse.url
-    url = Http.url address []
+    address =
+      reqResponse.url
+
+    url =
+      Http.url address []
   in
     get url
       |> send simulationResultsDecoder
 
--- Combine phasese 1 and 2...probably what you want.
+
+{-| Combine phasese 1 and 2...probably what you want.
+-}
 runSimulation : Simulation -> Task.Task Http.Error SimulationResults
 runSimulation sim =
   requestSimulation sim `Task.andThen` requestSimulationResults

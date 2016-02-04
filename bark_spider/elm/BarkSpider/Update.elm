@@ -1,4 +1,4 @@
-module BarkSpider.Update where
+module BarkSpider.Update (..) where
 
 import BarkSpider.Actions exposing (..)
 import BarkSpider.Model exposing (ID, Model)
@@ -15,15 +15,19 @@ import Result exposing (Result)
 import String
 import Task
 
+
 updateModify : ID -> SimActions.Action -> Model -> Model
 updateModify id action model =
   let
-    modifySimulation (simId, sim) =
+    modifySimulation ( simId, sim ) =
       if simId == id then
-        (simId, SimUpdate.update action sim)
+        ( simId, SimUpdate.update action sim )
       else
-        (simId, sim)
-    matchId (simId, sim) = simId == id
+        ( simId, sim )
+
+    matchId ( simId, sim ) =
+      simId == id
+
     sims =
       case action of
         SimActions.Delete ->
@@ -32,23 +36,27 @@ updateModify id action model =
         _ ->
           List.map modifySimulation model.simulations
   in
-    {model | simulations = sims}
+    { model | simulations = sims }
+
 
 addSimulation : Model -> Model
 addSimulation model =
   let
-    sim = createSimulation "unnamed"
+    sim =
+      createSimulation "unnamed"
   in
-    { model |
-      simulations = model.simulations ++ [ (model.next_id, sim) ]
-    , next_id = model.next_id + 1
+    { model
+      | simulations = model.simulations ++ [ ( model.next_id, sim ) ]
+      , next_id = model.next_id + 1
     }
+
 
 clearSimulationResults : Model -> Model
 clearSimulationResults model =
-  { model |
-      results = ""
+  { model
+    | results = ""
   }
+
 
 runSimulations : Model -> Effects Action
 runSimulations model =
@@ -61,6 +69,7 @@ runSimulations model =
       |> Task.sequence
       |> Task.map NewResults
       |> Effects.task
+
 
 handleNewResult : Result Http.Error SimulationResults -> Model -> Model
 handleNewResult result model =
@@ -75,7 +84,8 @@ handleNewResult result model =
         | error_messages = (toString error) :: model.error_messages
       }
 
-update : Action -> Model -> (Model, Effects Action)
+
+update : Action -> Model -> ( Model, Effects Action )
 update action model =
   case action of
     Modify index action ->
