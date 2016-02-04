@@ -3,6 +3,7 @@
 
 module BarkSpider.Network where
 
+import BarkSpider.Json exposing (..)
 import BarkSpider.Simulation.Model exposing (Parameters, Simulation, simulationToJson)
 import Dict
 import Http
@@ -10,9 +11,11 @@ import Http.Extra exposing (get, post, send, withBody, withHeader)
 import Json.Decode
 import Json.Decode exposing ((:=))
 import Json.Encode
-import List
-import String
 import Task
+
+--
+-- Data types
+--
 
 -- This is what we get back when we request that a simulation be run
 type alias RequestResponse =
@@ -28,16 +31,22 @@ type alias RequestResponse =
 --    "elapsed_time": {"<step>": "<elapsed time (int)>", . . .}},
 --  "parameters": {"interventions": "add 100 10", "assimilation_delay": 20, "training_overhead_proportion": 0.25}, "name": "+10 @ 100d"}
 
-type alias Results =
+-- The "data" payload of a simulation
+type alias SimulationData =
   { software_development_rate : Dict.Dict Int Float
   , elapsed_time : Dict.Dict Int Int
   }
 
+-- The top-level simulation results, including metadata, parameters, and data.
 type alias SimulationResults =
   { name : String            -- Name assigned to the results
   , parameters : Parameters  -- Parameters used to calculate the results
-  , results : Results        -- The results themselves
+  , results : SimulationData        -- The results themselves
   }
+
+--
+-- JSON decoders
+--
 
 requestResponseDecoder : Json.Decode.Decoder RequestResponse
 requestResponseDecoder =
@@ -67,26 +76,8 @@ parametersDecoder =
         ("training_overhead_proportion" := Json.Decode.float)
         ("interventions" := Json.Decode.string)
 
-toIntKeys : Dict.Dict String a -> Dict.Dict Int a
-toIntKeys d =
-  Dict.toList d
-    |> List.map (\(k, v) -> (String.toInt k |> Result.withDefault -1, v))
-    |> Dict.fromList
-
-stringFloatDecoder : Json.Decode.Decoder Float
-stringFloatDecoder =
-  Json.Decode.object1
-      (String.toFloat >> Result.withDefault -1)
-      Json.Decode.string
-
-stringIntDecoder : Json.Decode.Decoder Int
-stringIntDecoder =
-  Json.Decode.object1
-      (String.toInt >> Result.withDefault -1)
-      Json.Decode.string
-
-resultsDecoder : Json.Decode.Decoder Results
-resultsDecoder =
+simulationDataDecoder : Json.Decode.Decoder SimulationData
+simulationDataDecoder =
   let
     toResults s e =
       { software_development_rate = toIntKeys s
@@ -111,7 +102,7 @@ simulationResultsDecoder =
       toResults
       ("name" := Json.Decode.string)
       ("parameters" := parametersDecoder)
-      ("results" := resultsDecoder)
+      ("results" := simulationDataDecoder)
 
 --
 -- HTTP API
