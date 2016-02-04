@@ -2,7 +2,7 @@ module BarkSpider.Update where
 
 import BarkSpider.Actions exposing (..)
 import BarkSpider.Model exposing (ID, Model)
-import BarkSpider.Network exposing (..)
+import BarkSpider.Network exposing (runSimulation, SimulationResults)
 import BarkSpider.Simulation.Actions as SimActions
 import BarkSpider.Simulation.Model exposing (createSimulation)
 import BarkSpider.Simulation.Update as SimUpdate
@@ -57,7 +57,7 @@ runSimulations model =
       List.map snd model.simulations
         |> List.filter .included
   in
-    List.map (requestSimulation >> Task.toResult) sims
+    List.map (runSimulation >> Task.toResult) sims
       |> Task.sequence
       |> Task.map NewResults
       |> Effects.task
