@@ -1,8 +1,8 @@
 module BarkSpider.Update (..) where
 
 import BarkSpider.Actions exposing (..)
-import BarkSpider.Model exposing (ID, Model)
-import BarkSpider.Network exposing (runSimulation, SimulationResults)
+import BarkSpider.Model exposing (ID, Model, SimulationResults)
+import BarkSpider.Network exposing (runSimulation)
 import BarkSpider.Simulation.Actions as SimActions
 import BarkSpider.Simulation.Model exposing (createSimulation)
 import BarkSpider.Simulation.Update as SimUpdate

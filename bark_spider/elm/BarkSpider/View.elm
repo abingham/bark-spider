@@ -1,8 +1,7 @@
 module BarkSpider.View (..) where
 
 import BarkSpider.Actions exposing (..)
-import BarkSpider.Model exposing (ID, Model)
-import BarkSpider.Network exposing (SimulationResults)
+import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Simulation.Model exposing (Simulation)
 import BarkSpider.Simulation.View as SimView
 import Bootstrap.Html exposing (..)

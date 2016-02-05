@@ -1,7 +1,6 @@
 module BarkSpider.Actions (..) where
 
 import BarkSpider.Model
-import BarkSpider.Network
 import BarkSpider.Simulation.Actions
 import Http
 
@@ -16,4 +15,4 @@ type
     -- retrieval IDs.
   | RunSimulation
     -- simulation results have arrived and should be displayed.
-  | NewResults (List (Result Http.Error BarkSpider.Network.SimulationResults))
+  | NewResults (List (Result Http.Error BarkSpider.Model.SimulationResults))

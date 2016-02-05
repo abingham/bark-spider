@@ -5,8 +5,8 @@
 module BarkSpider.Network (..) where
 
 import BarkSpider.Json exposing (..)
+import BarkSpider.Model exposing (SimulationData, SimulationResults)
 import BarkSpider.Simulation.Model exposing (Parameters, Simulation, simulationToJson)
-import Dict
 import Http
 import Http.Extra exposing (get, post, send, withBody, withHeader)
 import Json.Decode
@@ -40,32 +40,6 @@ type alias RequestResponse =
 --    "step_number": {"<step>": "<step>", . . .},
 --    "elapsed_time": {"<step>": "<elapsed time (int)>", . . .}},
 --  "parameters": {"interventions": "add 100 10", "assimilation_delay": 20, "training_overhead_proportion": 0.25}, "name": "+10 @ 100d"}
-
-
-{-| The "data" payload of a simulation
--}
-type alias SimulationData =
-  { software_development_rate : Dict.Dict Int Float
-  , elapsed_time : Dict.Dict Int Int
-  }
-
-
-{-| The top-level simulation results, including metadata, parameters, and data.
--}
-type alias SimulationResults =
-  { name :
-      String
-      -- Name assigned to the results
-  , parameters :
-      Parameters
-      -- Parameters used to calculate the results
-  , results :
-      SimulationData
-      -- The results themselves
-  }
-
-
-
 --
 -- JSON decoders
 --
@@ -118,10 +92,10 @@ simulationDataDecoder =
 simulationResultsDecoder : Json.Decode.Decoder SimulationResults
 simulationResultsDecoder =
   let
-    toResults name parameters results =
+    toResults name parameters data =
       { name = name
       , parameters = parameters
-      , results = results
+      , data = data
       }
   in
     Json.Decode.object3
