@@ -32,7 +32,7 @@ resultToConfig : SimulationResults -> Series
 resultToConfig result =
   ( result.name
   , defStyle (rgba 220 220 220)
-  , Dict.values result.results.software_development_rate
+  , Dict.values result.data.software_development_rate
   )
 
 
@@ -44,7 +44,7 @@ resultsToChart results =
   in
     case res1 of
       Just res ->
-        ( Dict.values res.results.elapsed_time |> List.map toString
+        ( Dict.values res.data.elapsed_time |> List.map toString
         , List.map resultToConfig results
         )
           |> chart' 1000 1000
@@ -60,6 +60,7 @@ view address model =
     [ stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
     , stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"
     , script "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"
+    , script "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
     , row_
         [ colMd_
             12
