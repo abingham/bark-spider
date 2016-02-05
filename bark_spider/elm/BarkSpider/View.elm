@@ -8,7 +8,7 @@ import Bootstrap.Html exposing (..)
 import Chartjs.Line exposing (..)
 import Color exposing (..)
 import Dict
-import Html exposing (div, fromElement, Html, h1, node, text)
+import Html exposing (div, fromElement, Html, hr, h1, node, text)
 import Html.Attributes exposing (href, rel, src)
 import String
 
@@ -63,27 +63,26 @@ view address model =
     , script "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
     , row_
         [ colMd_
-            12
-            12
-            12
-            [ h1 [] [ text "Simulation Parameters" ]
-            , row_
+            4
+            4
+            4
+            ([ h1 [] [text "Simulation parameters"]
+             , row_
                 [ colMd_
                     12
                     12
                     12
                     [ btnDefault' "" { btnParam | label = Just "Add parameter set" } address AddSimulation
-                    , btnDefault' "pull-right" { btnParam | label = Just "Run simulation" } address RunSimulation
+                    , btnDefault' "pull-right btn-primary" { btnParam | label = Just "Run simulation" } address RunSimulation
                     ]
                 ]
-            , div [] (List.map (simView address) model.simulations)
+            , hr [] []
             ]
-        ]
-    , row_
-        [ colMd_
-            12
-            12
-            12
+            ++ List.map (simView address) model.simulations)
+        , colMd_
+            8
+            8
+            8
             [ resultsToChart model.results
             , text (String.concat model.error_messages)
             ]
