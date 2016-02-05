@@ -1,5 +1,6 @@
 module BarkSpider.Model (..) where
 
+import BarkSpider.Network exposing (SimulationResults)
 import BarkSpider.Simulation.Model exposing (createSimulation, Simulation)
 
 
@@ -9,7 +10,7 @@ type alias ID =
 
 type alias Model =
   { simulations : List ( ID, Simulation )
-  , results : String
+  , results : List SimulationResults
   , error_messages : List String
   , next_id : Int
   }
@@ -22,7 +23,7 @@ createModel =
       createSimulation "unnamed"
   in
     { simulations = []
-    , results = ""
+    , results = []
     , error_messages = []
     , next_id = 0
     }

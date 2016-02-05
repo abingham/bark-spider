@@ -12,7 +12,6 @@ import Http
 import List
 import List.Extra exposing (removeWhen)
 import Result exposing (Result)
-import String
 import Task
 
 
@@ -54,7 +53,7 @@ addSimulation model =
 clearSimulationResults : Model -> Model
 clearSimulationResults model =
   { model
-    | results = ""
+    | results = []
   }
 
 
@@ -76,7 +75,7 @@ handleNewResult result model =
   case result of
     Ok r ->
       { model
-        | results = String.append model.results (toString r)
+        | results = r :: model.results
       }
 
     Err error ->

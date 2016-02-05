@@ -8,6 +8,7 @@
     ],
     "exposed-modules": [],
     "dependencies": {
+        "abingham/elm-chartjs": "1.0.0 <= v <= 1.0.0",
         "circuithub/elm-bootstrap-html": "6.3.4 <= v < 7.0.0",
         "circuithub/elm-list-extra": "3.9.0 <= v < 4.0.0",
         "elm-lang/core": "3.0.0 <= v < 4.0.0",
