@@ -51,7 +51,7 @@ resultsToChart results =
           |> fromElement
 
       Nothing ->
-        text "No data"
+        div [] []
 
 
 view : Signal.Address Action -> Model -> Html
