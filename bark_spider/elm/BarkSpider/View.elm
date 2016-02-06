@@ -63,6 +63,7 @@ view address model =
     [ stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
     , stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"
     , script "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
+    , script "https://code.jquery.com/jquery-2.1.4.min.js"
     , row_
         [ colMd_
             4
