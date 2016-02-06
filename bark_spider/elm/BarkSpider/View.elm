@@ -44,10 +44,13 @@ resultsToChart results =
   in
     case res1 of
       Just res ->
-        ( Dict.values res.data.elapsed_time |> List.map toString
-        , List.map resultToConfig results
-        )
-          |> chart' 1000 1000
+        let
+          config = ( Dict.values res.data.elapsed_time |> List.map toString
+                   , List.map resultToConfig results
+                   )
+          options = {defaultOptions | animation = False }
+        in
+          chart 1000 1000 config options
           |> fromElement
 
       Nothing ->
