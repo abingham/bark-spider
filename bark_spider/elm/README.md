@@ -1,4 +1,5 @@
-This is an experimental version of bark-spider's web UI implemented using [elm](elm-lang.org).
+This is an experimental version of bark-spider's web UI implemented using
+[elm](elm-lang.org).
 
 Elm is a functional, statically-typed language, similar in flavor to F# and
 Haskell. It's main purpose is for writing functional-reactive web pages, and as
@@ -10,6 +11,8 @@ elm in a real project, and to see...for lack of a better term...if it's worth
 the effort.
 
 ## Quickstart
+
+0. First, install bark-spider as normal. See the top-level README.
 
 1. [Install elm](http://elm-lang.org/install).
 
@@ -27,18 +30,21 @@ git submodule update
 We currently use a hacked version of elm-chartjs, and we pull it in through a
 submodule since it's not available from the standard package system.
 
+First you may need to install bower, wisp, or some other tools to make this
+work:
+
+```
+npm install -g bower
+npm install -g wisp
+```
+
+Then build the chartjs extension:
+
 ```
 pushd chartjs
 sh ./update-from-bower.sh
 sh ./make.sh
 popd
-```
-
-Note that you may need to install bower, wisp, or some other tools to make this work:
-
-```
-npm install -g bower
-npm install -g wisp
 ```
 
 5. Build the HTML and JavaScript from the elm source:
@@ -56,3 +62,5 @@ will be served through pyramid at the `/elm` endpoint.
 cd ../..
 pserve development.ini
 ```
+
+Now if you navigate to localhost:6543/elm, you should see the elm-generated UI.
