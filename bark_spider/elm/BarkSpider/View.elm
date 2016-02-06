@@ -45,13 +45,16 @@ resultsToChart results =
     case res1 of
       Just res ->
         let
-          config = ( Dict.values res.data.elapsed_time |> List.map toString
-                   , List.map resultToConfig results
-                   )
-          options = {defaultOptions | animation = False }
+          config =
+            ( Dict.values res.data.elapsed_time |> List.map toString
+            , List.map resultToConfig results
+            )
+
+          options =
+            { defaultOptions | animation = False }
         in
           chart 1000 1000 config options
-          |> fromElement
+            |> fromElement
 
       Nothing ->
         div [] []
@@ -69,7 +72,7 @@ view address model =
             4
             4
             4
-            ([ h1 [] [text "Simulation parameters"]
+            ([ h1 [] [ text "Simulation parameters" ]
              , row_
                 [ colMd_
                     12
@@ -79,9 +82,10 @@ view address model =
                     , btnDefault' "pull-right btn-primary" { btnParam | label = Just "Run simulation" } address RunSimulation
                     ]
                 ]
-            , hr [] []
-            ]
-            ++ List.map (simView address) model.simulations)
+             , hr [] []
+             ]
+              ++ List.map (simView address) model.simulations
+            )
         , colMd_
             8
             8
