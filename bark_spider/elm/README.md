@@ -15,10 +15,36 @@ the effort.
 
 2. `cd` to the directory containing this file.
 
-3. Build the HTML and JavaScript from the elm source:
+3. Update subdmoules
 
 ```
-elm-make --yes BarkSpider.elm
+git submodule init
+git submodule update
+```
+
+4. Build chartjs
+
+We currently use a hacked version of elm-chartjs, and we pull it in through a
+submodule since it's not available from the standard package system.
+
+```
+pushd chartjs
+sh ./update-from-bower.sh
+sh ./make.sh
+popd
+```
+
+Note that you may need to install bower, wisp, or some other tools to make this work:
+
+```
+npm install -g bower
+npm install -g wisp
+```
+
+5. Build the HTML and JavaScript from the elm source:
+
+```
+elm-make --yes Main.elm
 ```
 
 This will install a bunch of dependencies and output an `index.html` file. This
