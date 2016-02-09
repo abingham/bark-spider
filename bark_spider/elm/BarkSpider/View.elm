@@ -4,6 +4,7 @@ import BarkSpider.Actions exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Simulation.Model exposing (Simulation)
 import BarkSpider.Simulation.View as SimView
+import BarkSpider.Util exposing (colors)
 import Bootstrap.Html exposing (..)
 import Chartjs.Line exposing (..)
 import Color exposing (..)
@@ -28,10 +29,10 @@ simView address ( id, sim ) =
   SimView.view (Signal.forwardTo address (Modify id)) sim
 
 
-resultToConfig : SimulationResults -> Series
-resultToConfig result =
+resultToConfig : SimulationResults -> (Float -> Color) -> Series
+resultToConfig result color =
   ( result.name
-  , defStyle (rgba 220 220 220)
+  , defStyle color
   , Dict.values result.data.software_development_rate
   )
 
@@ -47,7 +48,7 @@ resultsToChart results =
         let
           config =
             ( Dict.values res.data.elapsed_time |> List.map toString
-            , List.map resultToConfig results
+            , List.map2 resultToConfig results colors
             )
 
           options =
