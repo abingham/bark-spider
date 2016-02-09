@@ -11,11 +11,12 @@ import String
 hideButton : Signal.Address Action -> Simulation -> Html
 hideButton address sim =
   let
-    icon = { btnParam | icon = Just (glyphiconChevronDown' "") }
+    icon = if sim.hidden then glyphiconChevronRight' else glyphiconChevronDown'
+    params = { btnParam | icon = Just (icon "") }
   in
     span
       [ class "input-group-btn" ]
-      [ btnDefault' "form-control" icon address (SetHidden (not sim.hidden)) ]
+      [ btnDefault' "form-control" params address (SetHidden (not sim.hidden)) ]
 
 nameControls : Signal.Address Action -> Simulation -> Html
 nameControls address sim =
