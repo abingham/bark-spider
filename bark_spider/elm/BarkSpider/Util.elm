@@ -15,8 +15,8 @@ These are useful for coloring different data sets. We're mimicking the algorithm
 
     http://stackoverflow.com/questions/309149/generate-distinctly-different-rgb-colors-in-graphs
 -}
-colors : List (Float -> Color)
-colors =
+distinctColors : List (Float -> Color)
+distinctColors =
   let
     colorBases =
       [ 255, 128, 64, 192, 96, 48, 154, 77, 34, 111, 56, 28 ]

@@ -4,7 +4,7 @@ import BarkSpider.Actions exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Simulation.Model exposing (Simulation)
 import BarkSpider.Simulation.View as SimView
-import BarkSpider.Util exposing (colors)
+import BarkSpider.Util exposing (distinctColors)
 import Bootstrap.Html exposing (..)
 import Chartjs.Line exposing (..)
 import Color exposing (..)
@@ -48,7 +48,7 @@ resultsToChart results =
         let
           config =
             ( Dict.values res.data.elapsed_time |> List.map toString
-            , List.map2 resultToConfig results colors
+            , List.map2 resultToConfig results distinctColors
             )
 
           options =
