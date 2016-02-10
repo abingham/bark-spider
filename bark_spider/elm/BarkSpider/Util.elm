@@ -19,7 +19,7 @@ distinctColors : List (Float -> Color)
 distinctColors =
   let
     colorBases =
-      [ 255, 128, 64, 192, 96, 48, 154, 77, 34, 111, 56, 28 ]
+      [ 154, 77, 34, 111, 56, 28, 192, 96, 48, 255, 128, 64 ]
 
     colorSet base =
       [ (rgba 0 0 base), (rgba 0 base 0), (rgba base 0 0), (rgba 0 base base), (rgba base 0 base), (rgba base base 0) ]
