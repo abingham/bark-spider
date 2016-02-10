@@ -29,8 +29,8 @@ simView address ( id, sim ) =
   SimView.view (Signal.forwardTo address (Modify id)) sim
 
 
-resultToConfig : SimulationResults -> (Float -> Color) -> Series
-resultToConfig result color =
+resultToSeries : SimulationResults -> (Float -> Color) -> Series
+resultToSeries result color =
   ( result.name
   , defStyle color
   , Dict.values result.data.software_development_rate
@@ -48,14 +48,19 @@ resultsToChart results =
         let
           config =
             ( Dict.values res.data.elapsed_time |> List.map toString
-            , List.map2 resultToConfig results distinctColors
+            , List.map2 resultToSeries results distinctColors
             )
 
           options =
-            { defaultOptions | animation = False }
+            { defaultOptions
+              | animation = False
+              , pointDot = False
+            }
         in
           chart 1000 1000 config options
             |> fromElement
+
+      -- TODO: Insert legend. We need to add support for legends to the chartjs bindings.
 
       Nothing ->
         div [] []
