@@ -11,6 +11,7 @@ import Color exposing (..)
 import Dict
 import Html exposing (div, fromElement, Html, hr, h1, node, text)
 import Html.Attributes exposing (href, rel, src)
+import Html.Lazy
 import String
 
 
@@ -96,7 +97,7 @@ view address model =
             8
             8
             8
-            [ resultsToChart model.results
+            [ Html.Lazy.lazy resultsToChart model.results
             , text (String.concat model.error_messages)
             ]
         ]
