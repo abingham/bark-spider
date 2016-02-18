@@ -2,7 +2,7 @@ module BarkSpider.View (..) where
 
 import BarkSpider.Actions exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
-import BarkSpider.Simulation.Model exposing (Simulation)
+import BarkSpider.Simulation.Model exposing (Simulation, createSimulation)
 import BarkSpider.Simulation.View as SimView
 import BarkSpider.Util exposing (distinctColors)
 import Bootstrap.Html exposing (..)
@@ -85,7 +85,7 @@ view address model =
                     12
                     12
                     12
-                    [ btnDefault' "" { btnParam | label = Just "Add parameter set" } address AddSimulation
+                    [ btnDefault' "" { btnParam | label = Just "Add parameter set" } address (AddSimulation (createSimulation "unnamed"))
                     , btnDefault' "pull-right btn-primary" { btnParam | label = Just "Run simulation" } address RunSimulation
                     ]
                 ]

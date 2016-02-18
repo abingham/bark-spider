@@ -95,7 +95,7 @@ interventionsControls address sim =
               [ class "form-control"
               , on "input" targetValue sendSignal
               ]
-              []
+              [text sim.parameters.interventions]
           ]
       ]
     ]

@@ -1,16 +1,17 @@
 module BarkSpider.Actions (..) where
 
 import BarkSpider.Model
-import BarkSpider.Simulation.Actions
+import BarkSpider.Simulation.Actions as BSA
+import BarkSpider.Simulation.Model as BSM
 import Http
 
 
 type
   Action
   -- Update the Simulation with the ID
-  = Modify BarkSpider.Model.ID BarkSpider.Simulation.Actions.Action
+  = Modify BarkSpider.Model.ID BSA.Action
     -- create a new simulation parameter set
-  | AddSimulation
+  | AddSimulation BSM.Simulation
     -- send parameter sets to server, requesting simulation. Server responds with
     -- retrieval IDs.
   | RunSimulation
