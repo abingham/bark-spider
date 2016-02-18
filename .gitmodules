@@ -1,3 +1,0 @@
-[submodule "bark_spider/elm/chartjs"]
-	path = bark_spider/elm/chartjs
-	url = https://github.com/fresheyeball/elm-chartjs
