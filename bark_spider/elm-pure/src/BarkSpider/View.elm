@@ -1,40 +1,55 @@
 module BarkSpider.View (..) where
 
-import Html exposing (Html, node, href)
-import Html.Attributes exposing (rel)
+import Color
+import Chartjs.Line exposing (defStyle, defaultOptions, chart)
+import String
+import Html exposing (Html, node, span, input, div, label, text, textarea, fromElement, h1, hr)
+import Html.Lazy
+import Html.Attributes exposing (rel, class, type', value, href, src)
+import Html.Events exposing (on, targetValue)
 import Dict
+import BarkSpider.Util exposing (distinctColors)
+import BarkSpider.Comms as Comms
 import BarkSpider.Model as Model
-import BarkSpider.Simulation as Sim
+import BarkSpider.Simulation exposing (Simulation, createSimulation)
+import Bootstrap.Html exposing (glyphiconChevronRight', glyphiconChevronDown', btnParam, btnDefault', row_, colSm_, containerFluid_, colMd_)
+
+type alias SimViewParams =
+  { hidden : Bool
+  }
 
 
 type alias ViewModel =
   { model : Model.Model
-  , hidden : Dict Model.ID Bool
+  , simViewParams : Dict.Dict Model.ID SimViewParams
   }
 
+type SimulationAction
+  = Delete
+  | SetHidden Bool
+  | SetAssimilationDelay Int
+  | SetTrainingOverheadProportion Float
+  | SetInterventions String
+  | SetName String
+  | SetIncluded Bool
+
 type Action
-  = AddSimulation Sim.Simulation
-  | DeleteSimulation Model.ID
-  | SetHidden Model.ID Bool
-  | SetAssimilationDelay Model.ID
-  | SetTrainingOverheadProportion Model.ID
-  | SetInterventions Model.ID
-  | SetName Model.ID
-  | SetIncluded Model.ID
+  = AddSimulation Simulation
+  | ModifySimulation Model.ID SimulationAction
   | RunSimulation
 
 -- Simulation view
-hideButton : Signal.Address Action -> Simulation -> Html
-hideButton address sim =
+hideButton : Signal.Address SimulationAction -> Simulation -> SimViewParams -> Html
+hideButton address sim viewParams =
   let
-    icon = if sim.hidden then glyphiconChevronRight' else glyphiconChevronDown'
+    icon = if viewParams.hidden then glyphiconChevronRight' else glyphiconChevronDown'
     params = { btnParam | icon = Just (icon "") }
   in
     span
       [ class "input-group-btn" ]
-      [ btnDefault' "form-control" params address (SetHidden (not sim.hidden)) ]
+      [ btnDefault' "form-control" params address (SetHidden (not viewParams.hidden)) ]
 
-nameControls : Signal.Address Action -> Simulation -> Html
+nameControls : Signal.Address SimulationAction -> Simulation -> Html
 nameControls address sim =
   input [ type' "text"
         , class "form-control"
@@ -42,7 +57,7 @@ nameControls address sim =
         , on "input" targetValue (Signal.message address <<  SetName)]
     []
 
-controlButtons : Signal.Address Action -> Simulation -> Html
+controlButtons : Signal.Address SimulationAction -> Simulation -> Html
 controlButtons address sim =
   let
     included_text = { btnParam | label = Just (if sim.included then "exclude" else "include") }
@@ -54,10 +69,10 @@ controlButtons address sim =
       , btnDefault' "" delete_text address Delete
       ]
 
-assimilationDelayControls : Signal.Address Action -> Simulation -> List Html
+assimilationDelayControls : Signal.Address SimulationAction -> Simulation -> List Html
 assimilationDelayControls address sim =
   let
-    sendSignal = String.toInt >> Result.withDefault 0 >> SetAssimilationDelay >> SetParameter >> Signal.message address
+    sendSignal = String.toInt >> Result.withDefault 0 >> SetAssimilationDelay >> Signal.message address
   in
     [ row_
         [ colSm_ 4 4
@@ -74,10 +89,10 @@ assimilationDelayControls address sim =
         ]
     ]
 
-trainingOverheadControls : Signal.Address Action -> Simulation -> List Html
+trainingOverheadControls : Signal.Address SimulationAction -> Simulation -> List Html
 trainingOverheadControls address sim =
   let
-    sendSignal = String.toFloat >> Result.withDefault 0 >> SetTrainingOverheadProportion >> SetParameter >> Signal.message address
+    sendSignal = String.toFloat >> Result.withDefault 0 >> SetTrainingOverheadProportion >> Signal.message address
   in
     [ row_
         [ colSm_ 4 4
@@ -96,10 +111,10 @@ trainingOverheadControls address sim =
         ]
     ]
 
-interventionsControls : Signal.Address Action -> Simulation -> List Html
+interventionsControls : Signal.Address SimulationAction -> Simulation -> List Html
 interventionsControls address sim =
   let
-    sendSignal = SetInterventions >> SetParameter >> Signal.message address
+    sendSignal = SetInterventions >> Signal.message address
   in
     [ row_
       [ colSm_ 12 12
@@ -116,20 +131,20 @@ interventionsControls address sim =
       ]
     ]
 
-mainRow : Signal.Address Action -> Simulation -> List Html
-mainRow address sim =
+mainRow : Signal.Address SimulationAction -> Simulation -> SimViewParams -> List Html
+mainRow address sim viewParams =
   [ row_
       [ div
           [class "input-group"]
-          [ hideButton address sim
+          [ hideButton address sim viewParams
           , nameControls address sim
           , controlButtons address sim
           ]
       ]
   ]
 
-paramBlock : Signal.Address Action -> Simulation -> List Html
-paramBlock address sim =
+paramBlock : Signal.Address SimulationAction -> Simulation -> SimViewParams -> List Html
+paramBlock address sim viewParams =
   let
     html =
       [ assimilationDelayControls address sim
@@ -139,14 +154,14 @@ paramBlock address sim =
     result =
       [ div [ class "parameter-set-form" ] (List.concat html) ]
   in
-    if sim.hidden then [] else result
+    if viewParams.hidden then [] else result
 
 
-simulationView : Signal.Address Action -> Simulation -> Html
-simulationView address sim =
+simulationView : Signal.Address SimulationAction -> Simulation -> SimViewParams -> Html
+simulationView address sim viewParams =
   let
-    html = List.concat [ mainRow address sim
-                       , paramBlock address sim
+    html = List.concat [ mainRow address sim viewParams
+                       , paramBlock address sim viewParams
                        ]
   in
     div [] html
@@ -164,12 +179,12 @@ script url =
   node "script" [ src url ] []
 
 
-simView : Signal.Address Action -> ( ID, Simulation ) -> Html
-simView address ( id, sim ) =
-  SimView.view (Signal.forwardTo address (Modify id)) sim
+simView : Signal.Address Action -> Model.ID -> Simulation -> SimViewParams -> Html
+simView address id sim viewParams =
+  simulationView (Signal.forwardTo address (ModifySimulation id)) sim viewParams
 
 
-resultToSeries : Model.SimulationResults -> (Float -> Color) -> Series
+resultToSeries : Comms.SimulationResults -> (Float -> Color.Color) -> Chartjs.Line.Series
 resultToSeries result color =
   ( result.name
   , defStyle color
@@ -177,7 +192,7 @@ resultToSeries result color =
   )
 
 
-resultsToChart : List Model.SimulationResults -> Html
+resultsToChart : List Comms.SimulationResults -> Html
 resultsToChart results =
   let
     res1 =
@@ -224,13 +239,13 @@ view address viewModel =
                     12
                     12
                     12
-                    [ btnDefault' "" { btnParam | label = Just "Add parameter set" } address (AddSimulation (Sim.createSimulation "unnamed"))
+                    [ btnDefault' "" { btnParam | label = Just "Add parameter set" } address (AddSimulation (createSimulation "unnamed"))
                     , btnDefault' "pull-right btn-primary" { btnParam | label = Just "Run simulation" } address RunSimulation
                     ]
                 ]
              , hr [] []
              ]
-              ++ List.map (simView address) viewModel.model.simulations
+               -- ++ List.map (\(id, sim) -> simView address id, sim, (Dict.get id viewModel.simViewParams) (Dict.toList viewModel.model.simulations)
             )
         , colMd_
             8
