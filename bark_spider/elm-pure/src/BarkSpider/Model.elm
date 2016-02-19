@@ -1,40 +1,17 @@
 module BarkSpider.Model (..) where
 
-import BarkSpider.Simulation as Sim
+import BarkSpider.Simulation exposing (Simulation)
+import BarkSpider.Comms exposing (SimulationResults)
 import Dict
 
 
 type alias ID =
   Int
 
-
-{-| The "data" payload of a simulation
--}
-type alias SimulationData =
-  { software_development_rate : Dict.Dict Int Float
-  , elapsed_time : Dict.Dict Int Int
-  }
-
-
-{-| The results for a single simulation, including metadata, parameters, and data.
--}
-type alias SimulationResults =
-  { name :
-      String
-      -- Name assigned to the results
-  , parameters :
-      Sim.Parameters
-      -- Parameters used to calculate the results
-  , data :
-      SimulationData
-      -- The results themselves
-  }
-
-
 {-| Top-level model for the app.
 -}
 type alias Model =
-  { simulations : Dict.Dict ID Sim.Simulation
+  { simulations : Dict.Dict ID Simulation
   , results : List SimulationResults
   , error_messages : List String
   }
@@ -52,7 +29,7 @@ createModel =
 
 {-|
 -}
-addSimulation : Model -> ID -> Sim.Simulation -> Model
+addSimulation : Model -> ID -> Simulation -> Model
 addSimulation model id sim =
   { model
     | simulations = Dict.insert id sim model.simulations

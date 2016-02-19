@@ -2,10 +2,10 @@
 -- This implements the HTTP+JSON protocol that the server uses.
 
 
-module BarkSpider.Network (..) where
+module BarkSpider.Comms (SimulationResults) where
 
+import Dict
 import BarkSpider.Json exposing (..)
-import BarkSpider.Model exposing (SimulationData, SimulationResults)
 import BarkSpider.Simulation exposing (Parameters, Simulation, simulationToJson)
 import Http
 import Http.Extra exposing (get, post, send, withBody, withHeader)
@@ -29,6 +29,29 @@ type alias RequestResponse =
   , result_id :
       String
       -- The ID of the results (append to the url)
+  }
+
+
+{-| The "data" payload of a simulation
+-}
+type alias SimulationData =
+  { software_development_rate : Dict.Dict Int Float
+  , elapsed_time : Dict.Dict Int Int
+  }
+
+
+{-| The results for a single simulation, including metadata, parameters, and data.
+-}
+type alias SimulationResults =
+  { name :
+      String
+      -- Name assigned to the results
+  , parameters :
+      Parameters
+      -- Parameters used to calculate the results
+  , data :
+      SimulationData
+      -- The results themselves
   }
 
 
