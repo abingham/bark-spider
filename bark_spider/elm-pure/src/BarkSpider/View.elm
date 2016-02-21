@@ -18,6 +18,8 @@ type alias SimViewParams =
   { hidden : Bool
   }
 
+defaultSimViewParams : SimViewParams
+defaultSimViewParams = { hidden = False }
 
 type alias ViewModel =
   { model : Model.Model
@@ -220,6 +222,14 @@ resultsToChart results =
       Nothing ->
         div [] []
 
+viewParamSets : ViewModel -> List (Model.ID, Simulation, SimViewParams)
+viewParamSets viewModel =
+  let
+    getSimViewParams id = Dict.get id viewModel.simViewParams |> Maybe.withDefault defaultSimViewParams
+  in
+  List.map
+        (\(id, sim) -> (id, sim, getSimViewParams id))
+        (Dict.toList viewModel.model.simulations)
 
 view : Signal.Address Action -> ViewModel -> Html
 view address viewModel =
@@ -245,7 +255,7 @@ view address viewModel =
                 ]
              , hr [] []
              ]
-               -- ++ List.map (\(id, sim) -> simView address id, sim, (Dict.get id viewModel.simViewParams) (Dict.toList viewModel.model.simulations)
+               ++ List.map (\ (id, sim, svp) -> simView address id sim svp) (viewParamSets viewModel)
             )
         , colMd_
             8
