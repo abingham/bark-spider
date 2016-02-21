@@ -1,14 +1,13 @@
 module BarkSpider.App (app) where
 
-import BarkSpider.Model exposing (createModel, Model)
 import BarkSpider.Util exposing (noFx)
-import BarkSpider.View exposing (view, update)
+import BarkSpider.View exposing (view, update, defaultViewModel, ViewModel)
 import StartApp
 
-app : StartApp.App Model
+app : StartApp.App ViewModel
 app =
   StartApp.start
-    { init = noFx createModel
+    { init = noFx defaultViewModel
     , view = view
     , update = update
     , inputs = []

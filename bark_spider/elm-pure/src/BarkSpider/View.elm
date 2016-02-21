@@ -1,30 +1,42 @@
 module BarkSpider.View (..) where
 
-import Color
-import Chartjs.Line exposing (defStyle, defaultOptions, chart)
-import String
-import Html exposing (Html, node, span, input, div, label, text, textarea, fromElement, h1, hr)
-import Html.Lazy
-import Html.Attributes exposing (rel, class, type', value, href, src)
-import Html.Events exposing (on, targetValue)
-import Dict
-import BarkSpider.Util exposing (distinctColors)
 import BarkSpider.Comms as Comms
 import BarkSpider.Model as Model
 import BarkSpider.Simulation exposing (Simulation, createSimulation)
+import BarkSpider.Util exposing (distinctColors, noFx)
 import Bootstrap.Html exposing (glyphiconChevronRight', glyphiconChevronDown', btnParam, btnDefault', row_, colSm_, containerFluid_, colMd_)
+import Chartjs.Line exposing (defStyle, defaultOptions, chart)
+import Color
+import Dict
+import Effects
+import Html exposing (Html, node, span, input, div, label, text, textarea, fromElement, h1, hr)
+import Html.Attributes exposing (rel, class, type', value, href, src)
+import Html.Events exposing (on, targetValue)
+import Html.Lazy
+import String
+
 
 type alias SimViewParams =
   { hidden : Bool
   }
 
+
 defaultSimViewParams : SimViewParams
-defaultSimViewParams = { hidden = False }
+defaultSimViewParams =
+  { hidden = False }
+
 
 type alias ViewModel =
   { model : Model.Model
   , simViewParams : Dict.Dict Model.ID SimViewParams
   }
+
+defaultViewModel : ViewModel
+defaultViewModel =
+  { model = Model.createModel
+  , simViewParams = Dict.empty
+  }
+
 
 type SimulationAction
   = Delete
@@ -35,115 +47,168 @@ type SimulationAction
   | SetName String
   | SetIncluded Bool
 
+
 type Action
   = AddSimulation Simulation
   | ModifySimulation Model.ID SimulationAction
   | RunSimulation
 
+
+update : Action -> ViewModel -> ( ViewModel, Effects.Effects Action )
+update action =
+  noFx
+
+
+
 -- Simulation view
+
+
 hideButton : Signal.Address SimulationAction -> Simulation -> SimViewParams -> Html
 hideButton address sim viewParams =
   let
-    icon = if viewParams.hidden then glyphiconChevronRight' else glyphiconChevronDown'
-    params = { btnParam | icon = Just (icon "") }
+    icon =
+      if viewParams.hidden then
+        glyphiconChevronRight'
+      else
+        glyphiconChevronDown'
+
+    params =
+      { btnParam | icon = Just (icon "") }
   in
     span
       [ class "input-group-btn" ]
       [ btnDefault' "form-control" params address (SetHidden (not viewParams.hidden)) ]
 
+
 nameControls : Signal.Address SimulationAction -> Simulation -> Html
 nameControls address sim =
-  input [ type' "text"
-        , class "form-control"
-        , value sim.name
-        , on "input" targetValue (Signal.message address <<  SetName)]
+  input
+    [ type' "text"
+    , class "form-control"
+    , value sim.name
+    , on "input" targetValue (Signal.message address << SetName)
+    ]
     []
+
 
 controlButtons : Signal.Address SimulationAction -> Simulation -> Html
 controlButtons address sim =
   let
-    included_text = { btnParam | label = Just (if sim.included then "exclude" else "include") }
-    delete_text = { btnParam | label = Just "delete" }
+    included_text =
+      { btnParam
+        | label =
+            Just
+              (if sim.included then
+                "exclude"
+               else
+                "include"
+              )
+      }
+
+    delete_text =
+      { btnParam | label = Just "delete" }
   in
     div
-      [ class "input-group-btn"]
+      [ class "input-group-btn" ]
       [ btnDefault' "" included_text address (SetIncluded (not sim.included))
       , btnDefault' "" delete_text address Delete
       ]
 
+
 assimilationDelayControls : Signal.Address SimulationAction -> Simulation -> List Html
 assimilationDelayControls address sim =
   let
-    sendSignal = String.toInt >> Result.withDefault 0 >> SetAssimilationDelay >> Signal.message address
+    sendSignal =
+      String.toInt >> Result.withDefault 0 >> SetAssimilationDelay >> Signal.message address
   in
     [ row_
-        [ colSm_ 4 4
-            [ label [class "control-label pull-right"] [text "Assimilation delay (days)"] ]
-        , colSm_ 8 8
-            [ input [class "form-control pull-right"
-                    , type' "number"
-                    , Html.Attributes.min "0"
-                    , value (toString sim.parameters.assimilation_delay)
-                    , on "input" targetValue sendSignal
-                    ]
+        [ colSm_
+            4
+            4
+            [ label [ class "control-label pull-right" ] [ text "Assimilation delay (days)" ] ]
+        , colSm_
+            8
+            8
+            [ input
+                [ class "form-control pull-right"
+                , type' "number"
+                , Html.Attributes.min "0"
+                , value (toString sim.parameters.assimilation_delay)
+                , on "input" targetValue sendSignal
+                ]
                 []
             ]
         ]
     ]
+
 
 trainingOverheadControls : Signal.Address SimulationAction -> Simulation -> List Html
 trainingOverheadControls address sim =
   let
-    sendSignal = String.toFloat >> Result.withDefault 0 >> SetTrainingOverheadProportion >> Signal.message address
+    sendSignal =
+      String.toFloat >> Result.withDefault 0 >> SetTrainingOverheadProportion >> Signal.message address
   in
     [ row_
-        [ colSm_ 4 4
-            [ label [ class "control-label pull-right"] [text "Training overhead (0-1)" ] ]
-        , colSm_ 8 8
-            [ input [ class "form-control pull-right"
-                    , type' "number"
-                    , Html.Attributes.min "0"
-                    , Html.Attributes.max "1"
-                    , Html.Attributes.step "0.01"
-                    , value (toString sim.parameters.training_overhead_proportion)
-                    , on "input" targetValue sendSignal
-                    ]
+        [ colSm_
+            4
+            4
+            [ label [ class "control-label pull-right" ] [ text "Training overhead (0-1)" ] ]
+        , colSm_
+            8
+            8
+            [ input
+                [ class "form-control pull-right"
+                , type' "number"
+                , Html.Attributes.min "0"
+                , Html.Attributes.max "1"
+                , Html.Attributes.step "0.01"
+                , value (toString sim.parameters.training_overhead_proportion)
+                , on "input" targetValue sendSignal
+                ]
                 []
             ]
         ]
     ]
 
+
 interventionsControls : Signal.Address SimulationAction -> Simulation -> List Html
 interventionsControls address sim =
   let
-    sendSignal = SetInterventions >> Signal.message address
+    sendSignal =
+      SetInterventions >> Signal.message address
   in
     [ row_
-      [ colSm_ 12 12
-          [ label [ class "control-label" ] [ text "Interventions" ] ]
-      ]
-  , row_
-      [ colSm_ 12 12
-          [ textarea
-              [ class "form-control"
-              , on "input" targetValue sendSignal
-              ]
-              [text sim.parameters.interventions]
-          ]
-      ]
+        [ colSm_
+            12
+            12
+            [ label [ class "control-label" ] [ text "Interventions" ] ]
+        ]
+    , row_
+        [ colSm_
+            12
+            12
+            [ textarea
+                [ class "form-control"
+                , on "input" targetValue sendSignal
+                ]
+                [ text sim.parameters.interventions ]
+            ]
+        ]
     ]
+
 
 mainRow : Signal.Address SimulationAction -> Simulation -> SimViewParams -> List Html
 mainRow address sim viewParams =
   [ row_
       [ div
-          [class "input-group"]
+          [ class "input-group" ]
           [ hideButton address sim viewParams
           , nameControls address sim
           , controlButtons address sim
           ]
       ]
   ]
+
 
 paramBlock : Signal.Address SimulationAction -> Simulation -> SimViewParams -> List Html
 paramBlock address sim viewParams =
@@ -153,23 +218,31 @@ paramBlock address sim viewParams =
       , trainingOverheadControls address sim
       , interventionsControls address sim
       ]
+
     result =
       [ div [ class "parameter-set-form" ] (List.concat html) ]
   in
-    if viewParams.hidden then [] else result
+    if viewParams.hidden then
+      []
+    else
+      result
 
 
 simulationView : Signal.Address SimulationAction -> Simulation -> SimViewParams -> Html
 simulationView address sim viewParams =
   let
-    html = List.concat [ mainRow address sim viewParams
-                       , paramBlock address sim viewParams
-                       ]
+    html =
+      List.concat
+        [ mainRow address sim viewParams
+        , paramBlock address sim viewParams
+        ]
   in
     div [] html
 
 
+
 -- Model view
+
 
 stylesheet : String -> Html
 stylesheet url =
@@ -218,18 +291,20 @@ resultsToChart results =
             |> fromElement
 
       -- TODO: Insert legend. We need to add support for legends to the chartjs bindings.
-
       Nothing ->
         div [] []
 
-viewParamSets : ViewModel -> List (Model.ID, Simulation, SimViewParams)
+
+viewParamSets : ViewModel -> List ( Model.ID, Simulation, SimViewParams )
 viewParamSets viewModel =
   let
-    getSimViewParams id = Dict.get id viewModel.simViewParams |> Maybe.withDefault defaultSimViewParams
+    getSimViewParams id =
+      Dict.get id viewModel.simViewParams |> Maybe.withDefault defaultSimViewParams
   in
-  List.map
-        (\(id, sim) -> (id, sim, getSimViewParams id))
-        (Dict.toList viewModel.model.simulations)
+    List.map
+      (\( id, sim ) -> ( id, sim, getSimViewParams id ))
+      (Dict.toList viewModel.model.simulations)
+
 
 view : Signal.Address Action -> ViewModel -> Html
 view address viewModel =
@@ -255,7 +330,7 @@ view address viewModel =
                 ]
              , hr [] []
              ]
-               ++ List.map (\ (id, sim, svp) -> simView address id sim svp) (viewParamSets viewModel)
+              ++ List.map (\( id, sim, svp ) -> simView address id sim svp) (viewParamSets viewModel)
             )
         , colMd_
             8

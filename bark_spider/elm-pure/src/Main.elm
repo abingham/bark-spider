@@ -1,10 +1,12 @@
-import BarkSpider.Model
-import BarkSpider.Simulation
-import BarkSpider.Json
-import BarkSpider.Network
+import BarkSpider.App
 
+import BarkSpider.App exposing (app)
+import Effects
 import Html
+import Task
 
-main : Html.Html
-main =
-  Html.text "hello"
+main : Signal Html.Html
+main = app.html
+
+port tasks : Signal (Task.Task Effects.Never ())
+port tasks = app.tasks
