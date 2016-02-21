@@ -28,13 +28,16 @@ defaultSimViewParams =
 
 type alias ViewModel =
   { model : Model.Model
-  , simViewParams : Dict.Dict Model.ID SimViewParams
+  , sim_view_params : Dict.Dict Model.ID SimViewParams
+  , next_id : Model.ID
   }
+
 
 defaultViewModel : ViewModel
 defaultViewModel =
   { model = Model.createModel
-  , simViewParams = Dict.empty
+  , sim_view_params = Dict.empty
+  , next_id = 0
   }
 
 
@@ -55,8 +58,24 @@ type Action
 
 
 update : Action -> ViewModel -> ( ViewModel, Effects.Effects Action )
-update action =
-  noFx
+update action viewModel =
+  case action of
+    AddSimulation sim ->
+      let
+        id =
+          viewModel.next_id
+
+        model =
+          Model.addSimulation viewModel.model id sim
+      in
+        { viewModel
+          | model = model
+          , next_id = id + 1
+        }
+          |> noFx
+
+    _ ->
+      noFx viewModel
 
 
 
@@ -299,7 +318,7 @@ viewParamSets : ViewModel -> List ( Model.ID, Simulation, SimViewParams )
 viewParamSets viewModel =
   let
     getSimViewParams id =
-      Dict.get id viewModel.simViewParams |> Maybe.withDefault defaultSimViewParams
+      Dict.get id viewModel.sim_view_params |> Maybe.withDefault defaultSimViewParams
   in
     List.map
       (\( id, sim ) -> ( id, sim, getSimViewParams id ))

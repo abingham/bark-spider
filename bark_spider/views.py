@@ -40,6 +40,13 @@ def main_plot_in_elm(request):
                             content_type='text/html')
     return response
 
+@view_config(route_name='elm-pure')
+def main_plot_in_elm(request):
+    response = FileResponse('bark_spider/elm-pure/index.html',
+                            request=request,
+                            content_type='text/html')
+    return response
+
 
 @view_config(route_name='simulate',
              request_method='POST',
