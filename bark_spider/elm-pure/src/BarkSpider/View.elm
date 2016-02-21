@@ -32,6 +32,8 @@ type alias ViewModel =
   , next_id : Model.ID
   }
 
+-- TODO: Consider constructing an alternative type for use in rendering which
+-- coalesces the view and non-view model elements under a single dict.
 
 defaultViewModel : ViewModel
 defaultViewModel =
@@ -57,6 +59,58 @@ type Action
   | RunSimulation
 
 
+updateSimulation : SimulationAction -> Simulation -> Simulation
+updateSimulation action sim =
+  case action of
+    SetHidden hidden ->
+      -- TODO
+      sim
+
+    SetAssimilationDelay delay ->
+      -- TODO
+      sim
+
+    SetTrainingOverheadProportion overhead ->
+      --TODO
+      sim
+
+    SetInterventions interventions ->
+      -- TODO
+      sim
+
+    SetName name ->
+      -- TODO
+      sim
+
+    SetIncluded included ->
+      -- TODO
+      sim
+
+    Delete ->
+      sim
+
+
+{-| Replace the simulation at an ID in a view model with a new simulation.
+-}
+modifySimulation : ViewModel -> Model.ID -> Simulation -> ViewModel
+modifySimulation viewModel id sim =
+  let
+    sims =
+      Dict.insert id sim viewModel.model.simulations
+
+    mod =
+      viewModel.model
+
+    model =
+      { mod
+        | simulations = sims
+      }
+  in
+    { viewModel
+      | model = model
+    }
+
+
 update : Action -> ViewModel -> ( ViewModel, Effects.Effects Action )
 update action viewModel =
   case action of
@@ -74,7 +128,22 @@ update action viewModel =
         }
           |> noFx
 
-    _ ->
+    ModifySimulation id Delete ->
+      -- TODO
+      noFx viewModel
+
+    ModifySimulation id simAction ->
+      case (Dict.get id viewModel.model.simulations) of
+        Just sim ->
+          modifySimulation viewModel id (updateSimulation simAction sim)
+            |> noFx
+
+        Nothing ->
+          -- TODO: What to do here?
+          noFx viewModel
+
+    RunSimulation ->
+      -- TODO
       noFx viewModel
 
 
