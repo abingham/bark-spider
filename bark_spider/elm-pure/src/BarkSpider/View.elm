@@ -45,27 +45,25 @@ defaultViewModel =
 
 type SimulationAction
   = Delete
-  | SetHidden Bool
   | SetAssimilationDelay Int
   | SetTrainingOverheadProportion Float
   | SetInterventions String
   | SetName String
   | SetIncluded Bool
 
+type SimulationViewAction
+  = SetHidden Bool
 
 type Action
   = AddSimulation Simulation
   | ModifySimulation Model.ID SimulationAction
+  | ModifySimulationView Model.ID SimulationViewAction
   | RunSimulation
 
 
 updateSimulation : SimulationAction -> Simulation -> Simulation
 updateSimulation action sim =
   case action of
-    SetHidden hidden ->
-      -- TODO
-      sim
-
     SetAssimilationDelay delay ->
       -- TODO
       sim
@@ -89,6 +87,13 @@ updateSimulation action sim =
     Delete ->
       sim
 
+updateSimulationView : SimulationViewAction -> SimViewParams -> SimViewParams
+updateSimulationView action params =
+  case action of
+    SetHidden hidden ->
+      { params
+        | hidden = hidden
+      }
 
 {-| Replace the simulation at an ID in a view model with a new simulation.
 -}
@@ -110,6 +115,25 @@ modifySimulation viewModel id sim =
       | model = model
     }
 
+{-| Replace the simulationview at an ID in a view model with new params
+ -}
+modifySimulationView : ViewModel -> Model.ID -> SimViewParams -> ViewModel
+modifySimulationView viewModel id simViewParams =
+  let
+    svps =
+      Dict.insert id simViewParams viewModel.sim_view_params
+
+    mod =
+      viewModel.model
+
+    model =
+      { mod
+        | sim_view_params = svps
+      }
+  in
+    { viewModel
+      | model = model
+    }
 
 update : Action -> ViewModel -> ( ViewModel, Effects.Effects Action )
 update action viewModel =
@@ -131,6 +155,16 @@ update action viewModel =
     ModifySimulation id Delete ->
       -- TODO
       noFx viewModel
+
+    ModifySimulation id simAction ->
+      case (Dict.get id viewModel.model.simulations) of
+        Just sim ->
+          modifySimulation viewModel id (updateSimulation simAction sim)
+            |> noFx
+
+        Nothing ->
+          -- TODO: What to do here?
+          noFx viewModel
 
     ModifySimulation id simAction ->
       case (Dict.get id viewModel.model.simulations) of
