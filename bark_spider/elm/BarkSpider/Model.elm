@@ -1,6 +1,6 @@
 module BarkSpider.Model (..) where
 
-import BarkSpider.Simulation.Model exposing (createSimulation, Parameters, Simulation)
+import BarkSpider.Simulation exposing (createSimulation, Parameters, Simulation)
 import Dict
 
 

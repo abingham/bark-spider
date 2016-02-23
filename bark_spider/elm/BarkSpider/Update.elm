@@ -3,9 +3,7 @@ module BarkSpider.Update (..) where
 import BarkSpider.Actions exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Network exposing (runSimulation)
-import BarkSpider.Simulation.Actions as SimActions
-import BarkSpider.Simulation.Model exposing (createSimulation, Simulation)
-import BarkSpider.Simulation.Update as SimUpdate
+import BarkSpider.Simulation as Sim
 import BarkSpider.Util exposing (noFx)
 import Effects exposing (Effects)
 import Http
@@ -15,12 +13,12 @@ import Result exposing (Result)
 import Task
 
 
-updateModify : ID -> SimActions.Action -> Model -> Model
+updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
   let
     modifySimulation ( simId, sim ) =
       if simId == id then
-        ( simId, SimUpdate.update action sim )
+        ( simId, Sim.update action sim )
       else
         ( simId, sim )
 
@@ -29,7 +27,7 @@ updateModify id action model =
 
     sims =
       case action of
-        SimActions.Delete ->
+        Sim.Delete ->
           removeWhen matchId model.simulations
 
         _ ->
@@ -38,7 +36,7 @@ updateModify id action model =
     { model | simulations = sims }
 
 
-addSimulation : Model -> Simulation -> Model
+addSimulation : Model -> Sim.Simulation -> Model
 addSimulation model sim =
   { model
     | simulations = model.simulations ++ [ ( model.next_id, sim ) ]

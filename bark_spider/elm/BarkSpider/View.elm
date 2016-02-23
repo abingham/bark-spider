@@ -2,8 +2,7 @@ module BarkSpider.View (..) where
 
 import BarkSpider.Actions exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
-import BarkSpider.Simulation.Model exposing (Simulation, createSimulation)
-import BarkSpider.Simulation.View as SimView
+import BarkSpider.Simulation as Sim
 import BarkSpider.Util exposing (distinctColors)
 import Bootstrap.Html exposing (..)
 import Chartjs.Line exposing (..)
@@ -25,9 +24,9 @@ script url =
   node "script" [ src url ] []
 
 
-simView : Signal.Address Action -> ( ID, Simulation ) -> Html
+simView : Signal.Address Action -> ( ID, Sim.Simulation ) -> Html
 simView address ( id, sim ) =
-  SimView.view (Signal.forwardTo address (Modify id)) sim
+  Sim.view (Signal.forwardTo address (Modify id)) sim
 
 
 resultToSeries : SimulationResults -> (Float -> Color) -> Series
@@ -85,7 +84,7 @@ view address model =
                     12
                     12
                     12
-                    [ btnDefault' "" { btnParam | label = Just "Add parameter set" } address (AddSimulation (createSimulation "unnamed"))
+                    [ btnDefault' "" { btnParam | label = Just "Add parameter set" } address (AddSimulation (Sim.createSimulation "unnamed"))
                     , btnDefault' "pull-right btn-primary" { btnParam | label = Just "Run simulation" } address RunSimulation
                     ]
                 ]

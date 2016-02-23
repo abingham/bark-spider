@@ -6,7 +6,7 @@ module BarkSpider.Network (..) where
 
 import BarkSpider.Json exposing (..)
 import BarkSpider.Model exposing (SimulationData, SimulationResults)
-import BarkSpider.Simulation.Model exposing (Parameters, Simulation, simulationToJson)
+import BarkSpider.Simulation exposing (Parameters, Simulation, simulationToJson)
 import Http
 import Http.Extra exposing (get, post, send, withBody, withHeader)
 import Json.Decode
