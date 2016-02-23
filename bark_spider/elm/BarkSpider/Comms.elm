@@ -1,8 +1,8 @@
--- Functions for requesting simulation execution and results from the server.
--- This implements the HTTP+JSON protocol that the server uses.
+module BarkSpider.Comms (..) where
 
-
-module BarkSpider.Network (..) where
+{-| Functions for requesting simulation execution and results from the server.
+This implements the HTTP+JSON protocol that the server uses.
+-}
 
 import BarkSpider.Json exposing (..)
 import BarkSpider.Model exposing (SimulationData, SimulationResults)

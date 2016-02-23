@@ -2,7 +2,7 @@ module BarkSpider.Update (..) where
 
 import BarkSpider.Actions exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
-import BarkSpider.Network exposing (runSimulation)
+import BarkSpider.Comms exposing (runSimulation)
 import BarkSpider.Simulation as Sim
 import BarkSpider.Util exposing (noFx)
 import Effects exposing (Effects)
