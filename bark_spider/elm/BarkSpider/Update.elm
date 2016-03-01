@@ -12,7 +12,8 @@ import List.Extra exposing (removeWhen)
 import Result exposing (Result)
 import Task
 
-
+{-| Update the simulation parameters by ID based on an Action.
+ -}
 updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
   let
