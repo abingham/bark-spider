@@ -12,7 +12,8 @@ import List.Extra exposing (removeWhen)
 import Result exposing (Result)
 import Task
 
-
+{-| Update the simulation parameters by ID based on an Action.
+ -}
 updateModify : ID -> Sim.Action -> Model -> Model
 updateModify id action model =
   let
@@ -35,7 +36,8 @@ updateModify id action model =
   in
     { model | simulations = sims }
 
-
+{-| Add a simulation to a model using the next available ID.
+-}
 addSimulation : Model -> Sim.Simulation -> Model
 addSimulation model sim =
   { model
@@ -43,14 +45,17 @@ addSimulation model sim =
     , next_id = model.next_id + 1
   }
 
-
+{-| Remove all simulation results from a model.
+-}
 clearSimulationResults : Model -> Model
 clearSimulationResults model =
   { model
     | results = []
   }
 
-
+{-| Launch all simulations in a model as Effects that come back as NewResults
+actions.
+-}
 runSimulations : Model -> Effects Action
 runSimulations model =
   let
@@ -63,7 +68,8 @@ runSimulations model =
       |> Task.map NewResults
       |> Effects.task
 
-
+{-| Append simulation results (or errors) to a model.
+-}
 handleNewResult : Result Http.Error SimulationResults -> Model -> Model
 handleNewResult result model =
   case result of
@@ -77,7 +83,8 @@ handleNewResult result model =
         | error_messages = (toString error) :: model.error_messages
       }
 
-
+{-| Update a model and/or launch effects based on an action.
+-}
 update : Action -> Model -> ( Model, Effects Action )
 update action model =
   case action of
