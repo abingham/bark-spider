@@ -49,7 +49,7 @@ Python, Elm, and so forth.
 4. Now start up the pyramid server:
 
         vagrant ssh
-        # You're not in the vagrant VM
+        # You're now in the vagrant VM
         cd /vagrant
         nohup pserve development.ini --reload &
         exit
