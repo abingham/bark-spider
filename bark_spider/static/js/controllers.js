@@ -84,7 +84,7 @@
                              }
                          }).then(
                              function(response) {
-                                 
+
                                  return $http({
                                      method: 'GET',
                                      url: response.data.url
@@ -92,13 +92,13 @@
                                      var name = response.data.name;
                                      var results = response.data.results;
                                      var parameters = response.data.parameters;
-                                     
+
                                      // Only update labels if we have more data points
                                      var elapsed_time = results.elapsed_time;
                                      if (_.size(elapsed_time) > labels.length) {
                                          labels = _.values(elapsed_time);
                                      }
-                                     
+
                                      series.push(name);
                                      data.push(_.values(results.software_development_rate));
                                  });
@@ -125,6 +125,6 @@
         'ParameterSetCtrl',
         ['$scope',
          function($scope) {
-             $scope.opened = false;
+             $scope.opened = true;
          }]);
 }());
