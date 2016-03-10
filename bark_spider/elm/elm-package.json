@@ -5,10 +5,11 @@
     "license": "BSD3",
     "source-directories": [
         ".",
-        "chartjs/src"
+        "chartjs/src",
+        "elm-param-parsing/src"
     ],
-    "native-modules": true,
     "exposed-modules": [],
+    "native-modules": true,
     "dependencies": {
         "circuithub/elm-bootstrap-html": "6.3.4 <= v < 7.0.0",
         "circuithub/elm-list-extra": "3.9.0 <= v < 4.0.0",
