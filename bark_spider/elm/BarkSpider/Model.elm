@@ -17,6 +17,8 @@ type alias SimulationData =
 
 
 {-| The results for a single simulation, including metadata, parameters, and data.
+
+This is what comes back from the server when we request simulation results.
 -}
 type alias SimulationResults =
   { name :
