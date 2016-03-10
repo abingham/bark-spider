@@ -71,6 +71,7 @@ view address model =
   containerFluid_
     [ stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
     , stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+    , stylesheet "/static/bark_spider.css"
     , script "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
     , script "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
     , row_
