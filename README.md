@@ -87,7 +87,9 @@ point a browser at localhost:6543 to run the tool.
 
         pserve development.ini
 
-6. Visit <http://0.0.0.0:6543> in your browser
+6. Visit <http://0.0.0.0:6544> in your browser. Note that we use a different
+   port for vagrant installations than local. This helps prevent collisions
+   during development.
 
 7. Run rings around the competition with your new-found insight into
    software processes.

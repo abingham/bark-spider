@@ -72,5 +72,5 @@ Vagrant.configure(2) do |config|
   config.vm.provision :shell, path: "bootstrap.sh"
 
   # pyramid server is on 6543 by default
-  config.vm.network :forwarded_port, guest: 6543, host: 6543
+  config.vm.network :forwarded_port, guest: 6543, host: 6544
 end
