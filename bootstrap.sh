@@ -37,6 +37,8 @@ sudo python3 setup.py install
 
 ### Build the Elm UI code
 cd bark_spider/elm
+# TODO: I've seen this fail a few times fetching packages. Perhaps we need a
+# retry mechanism when it fails.
 elm-make Main.elm --yes --output=../static/js/elm.js
 
 ### Install brooks
