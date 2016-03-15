@@ -7,25 +7,31 @@ import Html
 import Task
 import UrlParameterParser
 
-import Debug
 
 main : Signal Html.Html
 main =
-  let
-    foo = Debug.log "params" parameters
-  in
-    app.html
+  app.html
 
-port locationSearch : String
 
+{-| Standard port for letting tasks interact with the native world.
+-}
 port tasks : Signal (Task.Task Effects.Never ())
 port tasks =
   app.tasks
 
+
+{-| The URL parameter dict provided when the page is invoked.
+-}
 parameters : Dict.Dict String String
 parameters =
   case (UrlParameterParser.parseSearchString locationSearch) of
-    UrlParameterParser.Error _ -> Dict.empty
-    UrlParameterParser.UrlParams dict -> dict
+    UrlParameterParser.Error _ ->
+      Dict.empty
 
--- TODO: git submodule for urlparam stuff
+    UrlParameterParser.UrlParams dict ->
+      dict
+
+
+{-| Port for receiving any URL parameters the user provided.
+ -}
+port locationSearch : String
