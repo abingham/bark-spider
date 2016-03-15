@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
 
+# Retries a command on failure.
+# retry <num-attempts> <retry-interval> <command . . .>
+retry() {
+    local -r -i max_attempts="$1"; shift
+    local -r -i delay="$1"; shift
+    local -r cmd="$@"
+    local -i attempt_num=1
+
+    until $cmd
+    do
+        if (( attempt_num == max_attempts ))
+        then
+            echo "Max retries reached for $cmd"
+            return 1
+        else
+            echo "Attempt $attempt_num failed! Trying again in $delay seconds..."
+            sleep $delay
+        fi
+    done
+}
+
 # Bootstrap the vagrant image
 
 sudo apt-get update
@@ -37,9 +58,7 @@ sudo python3 setup.py install
 
 ### Build the Elm UI code
 cd bark_spider/elm
-# TODO: I've seen this fail a few times fetching packages. Perhaps we need a
-# retry mechanism when it fails.
-elm-make Main.elm --yes --output=../static/js/elm.js
+retry 5 5 elm-make Main.elm --yes --output=../static/js/elm.js
 
 ### Install brooks
 cd
