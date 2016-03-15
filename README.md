@@ -79,13 +79,17 @@ point a browser at localhost:6543 to run the tool.
         elm-make Main.elm --yes --output=../static/js/elm.js
         popd
 
-4. Start the server:
+4. Install the bark spider server
+
+        python setup.py install
+
+5. Start the server:
 
         pserve development.ini
 
-5. Visit <http://0.0.0.0:6543> in your browser
+6. Visit <http://0.0.0.0:6543> in your browser
 
-6. Run rings around the competition with your new-found insight into
+7. Run rings around the competition with your new-found insight into
    software processes.
 
 ## Testing
