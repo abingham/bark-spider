@@ -37,7 +37,7 @@ sudo python3 setup.py install
 
 ### Build the Elm UI code
 cd bark_spider/elm
-elm-make --yes Main.elm
+elm-make Main.elm --yes --output=../static/js/elm.js
 
 ### Install brooks
 cd

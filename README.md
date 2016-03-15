@@ -76,7 +76,7 @@ point a browser at localhost:6543 to run the tool.
         sh ./update-from-bower.sh
         sh ./make.sh
         cd ..
-        elm-make --yes Main.elm
+        elm-make Main.elm --yes --output=../static/js/elm.js
         popd
 
 4. Start the server:
