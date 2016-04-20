@@ -64,13 +64,18 @@ point a browser at localhost:6543 to run the tool.
 
         mkvirtualenv bark-spider --python=python3.4
 
-2. Install the dependencies (the simulator and interventions are installed in
-   development mode direct from GitHub):
+2. Install the Python dependencies (the simulator and interventions are
+   installed in development mode direct from GitHub):
 
         pip install -r requirements.txt
 
-3. Build the Elm elements of the system. You'll need [elm](http://elm-lang.org/)
-   and [bower](http://bower.io/) for this.
+3. Make sure you have a few non-Python dependencies:
+
+  - [elm](elm-lang.org/install): Use the correct installer for your system, or try `npm install -g elm`.
+  - [bower](http://bower.io/): Try `npm install -g bower`.
+  - [wisp](https://github.com/Gozala/wisp#install): Try `npm install -g wisp`.
+
+3. Build the Elm elements of the system:
 
         pushd bark_spider/elm/chartjs
         sh ./update-from-bower.sh
