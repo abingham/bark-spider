@@ -54,7 +54,11 @@
              $scope.data = [];
 
              $scope.options = {
-                 pointDot: false
+                 pointDot: false,
+                 // showTooltips: true,
+                 // tooltipEvents: ["mousemove", "touchstart", "touchmove"],
+                 // tooltipFillColor: "rgba(0,0,0,0.8)",
+                 // tooltipTemplate: "<%=label%>,<%=value%>"
              };
 
              // Run a simulation using the currently configured parameter sets
@@ -110,6 +114,16 @@
                      });
 
                  $q.all(requests).then(function(_) {
+                     // Here's an example of how to use different labels. Assign labels_every_10 to $scope.labels.
+                     // var labels_every_10 = [];
+                     // for (var i = 0; i < labels.length; i++) {
+                     //     if (i % 10 == 0) {
+                     //         labels_every_10.push(labels[i]);
+                     //     }
+                     //     else {
+                     //         labels_every_10.push('');
+                     //     }
+                     // }
                      $scope.labels = labels;
                      $scope.series = series;
                      $scope.data = data;
