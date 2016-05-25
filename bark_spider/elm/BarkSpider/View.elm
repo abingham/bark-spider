@@ -69,11 +69,11 @@ resultsToChart results =
 view : Signal.Address Action -> Model -> Html
 view address model =
   containerFluid_
-    [ stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-    , stylesheet "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+    [ stylesheet "/static/external/css/bootstrap.min.css"
+    , stylesheet "/static/external/css/bootstrap-theme.min.css"
     , stylesheet "/static/bark_spider.css"
-    , script "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
-    , script "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+    , script "/static/external/js/jquery.min.js"
+    , script "/static/external/js/bootstrap.min.js"
     , row_
         [ colMd_
             4
