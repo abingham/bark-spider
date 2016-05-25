@@ -1,17 +1,17 @@
 <html>
     <head>
-        <link rel="stylesheet" href="static/lib/bootstrap.min.css">
-        <link rel="stylesheet" href="static/lib/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="static/lib/angular-chart.min.css">
+        <link rel="stylesheet" href="static/external/css/bootstrap.min.css">
+        <link rel="stylesheet" href="static/external/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="static/external/css/angular-chart.min.css">
 
-        <script src="static/lib/jquery-2.1.4.min.js"></script>
+        <script src="static/external/js/jquery-2.1.4.min.js"></script>
 
-        <script src="static/lib/bootstrap.min.js"></script>
-        <script src="static/lib/angular.min.js"></script>
-        <script src="static/lib/Chart.min.js"></script>
-        <script src="static/lib/angular-chart.min.js"></script>
-        <script src="static/lib/underscore-min.js"></script>
-        <script src="static/lib/ui-bootstrap-tpls.min.js"></script>
+        <script src="static/external/js/bootstrap.min.js"></script>
+        <script src="static/external/js/angular.min.js"></script>
+        <script src="static/external/js/Chart.min.js"></script>
+        <script src="static/external/js/angular-chart.min.js"></script>
+        <script src="static/external/js/underscore-min.js"></script>
+        <script src="static/external/js/ui-bootstrap-tpls.min.js"></script>
 
         <script src="static/js/app.js"></script>
         <script src="static/js/controllers.js"></script>
