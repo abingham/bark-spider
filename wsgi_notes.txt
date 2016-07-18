@@ -1,5 +1,16 @@
-The basic idea is that we use uwsgi to serve the application. The application itself is made available as a wsgi app. uwsgi sits behind nginx.
+The basic idea is that we use a wsgi server (e.g. cherrypy, waitress) to serve
+the application. The application itself is made available as a wsgi app. The
+wsgi server sits behind nginx.
 
-To run uwsgi server:
+To run a waitress-based wsgi server:
 
-    uwsgi --ini uwsgi_config.ini
+    python wsgi.py
+
+This listens on port 8080.
+
+To make nginx proxy for the wsgi server, you need to put `nginx-site.conf` into
+the "sites-enabled" directory of the nginx configuration,
+/etc/nginx.conf/sites-enabled. (At least, this is what you do on linux.) Then
+restart the nginx server (sudo service nginx restart).
+
+After that it should work.

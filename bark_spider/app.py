@@ -17,6 +17,3 @@ def make_app(global_config=None, **settings):
         lambda request: sim_db, 'db', reify=True)
 
     return config.make_wsgi_app()
-
-
-app = make_app()
