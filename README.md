@@ -82,7 +82,7 @@ point a browser at localhost:6543 to run the tool.
         sh ./make.sh
         cd ..
         elm-make Main.elm --yes --output=../static/js/elm.js
-        cp chartjs/src/Native/Chart.js ../../static/js
+        cp chartjs/src/Native/Chart.js ../static/js
         popd
 
 4. Install the bark spider server
