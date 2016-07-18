@@ -1,0 +1,5 @@
+The basic idea is that we use uwsgi to serve the application. The application itself is made available as a wsgi app. uwsgi sits behind nginx.
+
+To run uwsgi server:
+
+    uwsgi --ini uwsgi_config.ini

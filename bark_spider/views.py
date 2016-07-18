@@ -14,7 +14,7 @@ from .simulation.simulation import run_simulation
 _sim_pool = multiprocessing.pool.Pool()
 
 
-def _async_simulation(params, timeout=5):
+def _async_simulation(params, timeout=30):
     """Run a simulation asynchronously.
 
     Times out after `timeout` seconds, throwing a

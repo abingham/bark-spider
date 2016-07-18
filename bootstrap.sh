@@ -59,6 +59,7 @@ sudo python3 setup.py install
 ### Build the Elm UI code
 cd bark_spider/elm
 retry 5 5 elm-make Main.elm --yes --output=../static/js/elm.js
+cp chartjs/src/Native/Chart.js ../static/js/elm.js
 
 ### Install brooks
 cd
