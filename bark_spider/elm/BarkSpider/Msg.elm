@@ -1,4 +1,4 @@
-module BarkSpider.Actions (..) where
+module BarkSpider.Actions exposing (..)
 
 import BarkSpider.Model
 import BarkSpider.Simulation as Sim
@@ -6,9 +6,9 @@ import Http
 
 
 type
-  Action
+  Msg
   -- Update the Simulation with the ID
-  = Modify BarkSpider.Model.ID Sim.Action
+  = Modify BarkSpider.Model.ID Sim.Msg
     -- create a new simulation parameter set
   | AddSimulation Sim.Simulation
     -- send parameter sets to server, requesting simulation. Server responds with
