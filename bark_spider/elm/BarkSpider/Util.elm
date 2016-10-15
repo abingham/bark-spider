@@ -1,12 +1,24 @@
-module BarkSpider.Util exposing (..)
+module BarkSpider.Util exposing (distinctColors, noFx, performSucceed)
+
 
 import Color exposing (Color, rgba)
 import Platform.Cmd
+import Task
 
 
 noFx : model -> ( model, Platform.Cmd.Cmd a )
 noFx model =
     ( model, Platform.Cmd.none )
+
+
+performSucceed : (a -> msg) -> Task.Task Never a -> Cmd msg
+performSucceed =
+    Task.perform never
+
+
+never : Never -> a
+never n =
+    never n
 
 
 {-| A sequence of color templates which are fairly distinct.
