@@ -1,7 +1,7 @@
 -- Json utilities
 
 
-module BarkSpider.Json (..) where
+module BarkSpider.Json exposing (..)
 
 import Dict
 import Json.Decode
