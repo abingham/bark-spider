@@ -84,11 +84,11 @@ type Msg
     | Delete
 
 
-{-| Update low-level parameters based on action.
+{-| Update low-level parameters based on msg.
 -}
 updateParameters : SetParameterMsg -> Parameters -> Parameters
-updateParameters action params =
-    case action of
+updateParameters msg params =
+    case msg of
         SetAssimilationDelay d ->
             { params | assimilation_delay = d }
 
@@ -99,15 +99,15 @@ updateParameters action params =
             { params | interventions = i }
 
 
-{-| Update simulation based on action.
+{-| Update simulation based on msg.
 -}
 update : Msg -> Simulation -> Simulation
-update action model =
+update msg model =
     let
         parameters =
             model.parameters
     in
-        case action of
+        case msg of
             SetName n ->
                 { model | name = n }
 

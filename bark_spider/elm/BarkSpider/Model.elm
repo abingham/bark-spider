@@ -1,4 +1,4 @@
-module BarkSpider.Model (..) where
+module BarkSpider.Model exposing (..)
 
 import BarkSpider.Simulation exposing (createSimulation, Parameters, Simulation)
 import Dict
