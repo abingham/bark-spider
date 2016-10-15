@@ -4,7 +4,7 @@ import BarkSpider.Msg exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Comms exposing (runSimulation)
 import BarkSpider.Simulation as Sim
-import BarkSpider.Util exposing (noFx)
+import BarkSpider.Util exposing (noFx, performSucceed)
 import Http
 import List
 import List.Extra exposing (filterNot)
