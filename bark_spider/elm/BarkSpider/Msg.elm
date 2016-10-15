@@ -1,4 +1,4 @@
-module BarkSpider.Actions exposing (..)
+module BarkSpider.Msg exposing (..)
 
 import BarkSpider.Model
 import BarkSpider.Simulation as Sim

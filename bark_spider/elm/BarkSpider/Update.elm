@@ -1,20 +1,20 @@
-module BarkSpider.Update (..) where
+module BarkSpider.Update exposing (..)
 
-import BarkSpider.Actions exposing (..)
+import BarkSpider.Msg exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Comms exposing (runSimulation)
 import BarkSpider.Simulation as Sim
 import BarkSpider.Util exposing (noFx)
-import Effects exposing (Effects)
 import Http
 import List
-import List.Extra exposing (removeWhen)
+import List.Extra exposing (filterNot)
+import Platform.Cmd
 import Result exposing (Result)
 import Task
 
-{-| Update the simulation parameters by ID based on an Action.
+{-| Update the simulation parameters by ID based on an .
  -}
-updateModify : ID -> Sim.Action -> Model -> Model
+updateModify : ID -> Sim.Msg -> Model -> Model
 updateModify id action model =
   let
     modifySimulation ( simId, sim ) =
@@ -29,7 +29,7 @@ updateModify id action model =
     sims =
       case action of
         Sim.Delete ->
-          removeWhen matchId model.simulations
+          filterNot matchId model.simulations
 
         _ ->
           List.map modifySimulation model.simulations
@@ -56,17 +56,26 @@ clearSimulationResults model =
 {-| Launch all simulations in a model as Effects that come back as NewResults
 actions.
 -}
-runSimulations : Model -> Effects Action
+runSimulations : Model -> Platform.Cmd.Cmd Msg
 runSimulations model =
   let
     sims =
       List.map snd model.simulations
         |> List.filter .included
+
+    task =
+        List.map (runSimulation >> Task.toResult) sims
+            |> Task.sequence
   in
-    List.map (runSimulation >> Task.toResult) sims
-      |> Task.sequence
-      |> Task.map NewResults
-      |> Effects.task
+      -- TODO: This feels like a hack. The task.perform should never fail
+      -- (because of task.toResult above, failure here is meaningless). But task
+      -- perform requires *something* in this slot. Are we doing this wrong?
+      Task.perform
+          (\_ -> NewResults [])
+          NewResults
+          task
+
+
 
 {-| Append simulation results (or errors) to a model.
 -}
@@ -85,7 +94,7 @@ handleNewResult result model =
 
 {-| Update a model and/or launch effects based on an action.
 -}
-update : Action -> Model -> ( Model, Effects Action )
+update : Msg -> Model -> ( Model, Platform.Cmd.Cmd Msg  )
 update action model =
   case action of
     Modify index action ->
