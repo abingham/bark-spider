@@ -4,13 +4,14 @@ import BarkSpider.Msg exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Comms exposing (runSimulation)
 import BarkSpider.Simulation as Sim
-import BarkSpider.Util exposing (noFx, performSucceed)
+import BarkSpider.Util exposing (noFx)
 import Http
 import List
 import List.Extra exposing (filterNot)
 import Platform.Cmd
 import Result exposing (Result)
 import Task
+import Task.Extra exposing (performFailproof)
 
 {-| Update the simulation parameters by ID based on an .
  -}
@@ -70,8 +71,7 @@ runSimulations model =
       -- TODO: This feels like a hack. The task.perform should never fail
       -- (because of task.toResult above, failure here is meaningless). But task
       -- perform requires *something* in this slot. Are we doing this wrong?
-      Task.perform
-          (\_ -> NewResults [])
+      performFailproof
           NewResults
           task
 
