@@ -2,10 +2,9 @@ from io import StringIO
 import json
 import multiprocessing.pool
 
-from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
+from pyramid.httpexceptions import HTTPBadRequest, HTTPFound, HTTPNotFound
 from pyramid.response import FileResponse, Response
 from pyramid.view import view_config
-
 
 from .intervention import parse_interventions, ParseError
 from .json_util import DataFrameJSONEncoder
@@ -28,17 +27,9 @@ def _async_simulation(params, timeout=30):
     return result.get(timeout)
 
 
-@view_config(route_name='home', renderer='templates/main_plot.pt')
-def main_plot(request):
-    return {'project': 'bark_spider'}
-
-
-@view_config(route_name='elm')
-def main_plot_in_elm(request):
-    response = FileResponse('bark_spider/elm/index.html',
-                            request=request,
-                            content_type='text/html')
-    return response
+@view_config(route_name='root', request_method='GET')
+def root(request):
+    raise HTTPFound('static/index.html')
 
 
 @view_config(route_name='simulate',

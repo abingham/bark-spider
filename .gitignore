@@ -7,6 +7,6 @@ __pycache__
 node_modules
 .idea/
 elm-stuff
-elm.js
+bark_spider.js
 .vagrant
 .projectile

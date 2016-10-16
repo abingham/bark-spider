@@ -1,37 +1,31 @@
-module BarkSpider (..) where
+port module BarkSpider exposing (..)
 
 import BarkSpider.App exposing (app)
-import Dict
-import Effects
-import Html
-import Task
-import UrlParameterParser
+-- import Dict
+-- import Html
+-- import Query
+-- import Task
 
 
-main : Signal Html.Html
+main : Program Never
 main =
-  app.html
+  app
 
 
-{-| Standard port for letting tasks interact with the native world.
--}
-port tasks : Signal (Task.Task Effects.Never ())
-port tasks =
-  app.tasks
+-- {-| Standard port for letting tasks interact with the native world.
+-- -}
+-- port tasks : Signal (Task.Task Effects.Never ())
+-- port tasks =
+--   app.tasks
 
 
-{-| The URL parameter dict provided when the page is invoked.
--}
-parameters : Dict.Dict String String
-parameters =
-  case (UrlParameterParser.parseSearchString locationSearch) of
-    UrlParameterParser.Error _ ->
-      Dict.empty
-
-    UrlParameterParser.UrlParams dict ->
-      dict
+-- {-| The URL parameter dict provided when the page is invoked.
+-- -}
+-- parameters : List (String, Maybe String)
+-- parameters =
+--   Query.parseQuery locationSearch
 
 
-{-| Port for receiving any URL parameters the user provided.
- -}
-port locationSearch : String
+-- {-| Port for receiving any URL parameters the user provided.
+--  -}
+-- port locationSearch : (String -> Sub String

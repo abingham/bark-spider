@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Bark Spider</title>
+	      <script type="text/javascript" src="/static/external/js/jquery.min.js"></script>
+        <link rel="stylesheet" href="/static/external/css/pure-min.css">
+    </head>
+
+    <body>
+        <div id="bark-spider"></div>
+    </body>
+
+
+    <script type="text/javascript" src="/elm/bark_spider.js"></script>
+    <script type="text/javascript">
+     setTimeout(function() {
+         var node = document.getElementById('bark-spider')
+         var app = Elm.BarkSpider.embed(node);
+     }, 50);
+    </script>
+
+</html>
