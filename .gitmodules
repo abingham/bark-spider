@@ -1,6 +1,0 @@
-[submodule "bark_spider/elm/chartjs"]
-	path = bark_spider/elm/chartjs
-	url = http://github.com/abingham/elm-chartjs
-[submodule "bark_spider/elm/elm-param-parsing"]
-	path = bark_spider/elm/elm-param-parsing
-	url = https://github.com/abingham/elm-param-parsing.git
