@@ -3,14 +3,23 @@ module BarkSpider.View exposing (..)
 import BarkSpider.Msg exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Simulation as Sim
+
+
 -- import BarkSpider.Util exposing (distinctColors)
+
 import Bootstrap.Html exposing (..)
+
+
 -- import Color exposing (..)
 -- import Dict
+
 import Html exposing (div, Html, hr, h1, node, text)
 import Html.App
 import Html.Attributes exposing (href, rel, src)
+
+
 -- import Html.Lazy
+
 import String
 
 
@@ -65,12 +74,7 @@ simView ( id, sim ) =
 view : Model -> Html Msg
 view model =
     containerFluid_
-        [ stylesheet "/static/external/css/bootstrap.min.css"
-        , stylesheet "/static/external/css/bootstrap-theme.min.css"
-        , stylesheet "/static/bark_spider.css"
-        , script "/static/external/js/jquery.min.js"
-        , script "/static/external/js/bootstrap.min.js"
-        , row_
+        [ row_
             [ colMd_
                 4
                 4
