@@ -4,13 +4,10 @@ A web interface for Sixty North's software process simulation tools.
 
 ## Quickstart
 
-The first thing you need to do is clone this repository and update the
-submodules:
+The first thing you need to do is clone this repository:
 
     git clone git@github.com:sixty-north/bark-spider
     cd bark-spider
-    git submodule init
-    git submodule update
 
 Now, you can do the rest of the setup with Vagrant or manually.
 
@@ -60,9 +57,9 @@ point a browser at localhost:6543 to run the tool.
 
 ### Without Vagrant
 
-1. Create a virtual environment with Python 3.4:
+1. Create a virtual environment with Python 3.5:
 
-        mkvirtualenv bark-spider --python=python3.4
+        mkvirtualenv bark-spider --python=python3.5
 
 2. Install the Python dependencies (the simulator and interventions are
    installed in development mode direct from GitHub):
@@ -71,18 +68,13 @@ point a browser at localhost:6543 to run the tool.
 
 3. Make sure you have a few non-Python dependencies:
 
-  - [elm](http://elm-lang.org/install): Use the correct installer for your system, or try `npm install -g elm`.
+  - [elm](http://elm-lang.org/install): Version 0.17. Use the correct installer for your system, or try `npm install -g elm`.
   - [bower](http://bower.io/): Try `npm install -g bower`.
-  - [wisp](https://github.com/Gozala/wisp#install): Try `npm install -g wisp`.
 
 3. Build the Elm elements of the system:
 
-        pushd bark_spider/elm/chartjs
-        sh ./update-from-bower.sh
-        sh ./make.sh
-        cd ..
-        elm-make Main.elm --yes --output=../static/js/elm.js
-        cp chartjs/src/Native/Chart.js ../static/js
+        pushd bark_spider/elm/
+        elm-make Main.elm --yes --output=bark_spider.js
         popd
 
 4. Install the bark spider server
@@ -93,7 +85,7 @@ point a browser at localhost:6543 to run the tool.
 
         pserve development.ini
 
-6. Visit <http://0.0.0.0:6544> in your browser. Note that we use a different
+6. Visit <http://0.0.0.0:6543> in your browser. Note that we use a different
    port for vagrant installations than local. This helps prevent collisions
    during development.
 
