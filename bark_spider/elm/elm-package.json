@@ -11,6 +11,7 @@
     "exposed-modules": [],
     "native-modules": true,
     "dependencies": {
+        "NoRedInk/elm-decode-pipeline": "2.0.0 <= v < 3.0.0",
         "NoRedInk/elm-task-extra": "2.0.0 <= v < 3.0.0",
         "athanclark/elm-param-parsing-2": "1.0.0 <= v < 2.0.0",
         "circuithub/elm-bootstrap-html": "7.0.0 <= v < 8.0.0",

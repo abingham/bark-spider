@@ -10,7 +10,8 @@ import BarkSpider.Simulation exposing (Parameters, Simulation, simulationToJson)
 import Dict
 import Http
 import Json.Decode
-import Json.Decode exposing ((:=))
+import Json.Decode exposing ((:=), dict, int, float, string)
+import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode
 import Task
 
@@ -53,10 +54,9 @@ requestResponseDecoder =
             , result_id = result_id
             }
     in
-        Json.Decode.object2
-            toResponse
-            ("url" := Json.Decode.string)
-            ("result-id" := Json.Decode.string)
+        decode RequestResponse
+            |> required "url" string
+            |> required "result-id" string
 
 
 parametersDecoder : Json.Decode.Decoder Parameters
@@ -68,29 +68,24 @@ parametersDecoder =
             , interventions = i
             }
     in
-        Json.Decode.object3
-            toParameter
-            ("assimilation_delay" := Json.Decode.int)
-            ("training_overhead_proportion" := Json.Decode.float)
-            ("interventions" := Json.Decode.string)
+        decode Parameters
+            |> required "assimilation_delay" int
+            |> required "training_overhead_proportion" float
+            |> required "interventions" string
 
 
 simulationDataDecoder : Json.Decode.Decoder SimulationData
 simulationDataDecoder =
     let
-        toList =
+        keys =
             toIntKeys >> Dict.values
 
         toResults rates times =
-            List.map2
-                (,)
-                (toList times)
-                (toList rates)
+            List.map2 (,) (keys times) (keys rates)
     in
-        Json.Decode.object2
-            toResults
-            ("software_development_rate" := Json.Decode.dict stringFloatDecoder)
-            ("elapsed_time" := Json.Decode.dict stringIntDecoder)
+        decode toResults
+            |> required "software_development_rate" (dict stringFloatDecoder)
+            |> required "elapsed_time" (dict stringIntDecoder)
 
 
 simulationResultsDecoder : Json.Decode.Decoder SimulationResults
@@ -102,11 +97,10 @@ simulationResultsDecoder =
             , data = data
             }
     in
-        Json.Decode.object3
-            toResults
-            ("name" := Json.Decode.string)
-            ("parameters" := parametersDecoder)
-            ("results" := simulationDataDecoder)
+        decode toResults
+            |> required "name" string
+            |> required "parameters" parametersDecoder
+            |> required "results" simulationDataDecoder
 
 
 
