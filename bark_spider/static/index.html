@@ -23,6 +23,7 @@
      setTimeout(function() {
          var node = document.getElementById('bark-spider')
          var app = Elm.BarkSpider.embed(node);
+         var brooksChart = null;
 
          function chart(val) {
              // val is a list of objects {name: name, color: color, data}. `color` is an (r,
@@ -54,7 +55,12 @@
                  });
 
              var ctx = document.getElementById("bark-spider-canvas");
-             var scatterChart = new Chart(ctx, {
+
+             if (brooksChart) {
+                 brooksChart.destroy();
+             }
+
+             brooksChart = new Chart(ctx, {
                  type: 'line',
                  data: {
                      datasets: datasets
