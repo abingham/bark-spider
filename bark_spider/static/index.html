@@ -25,19 +25,25 @@
          var app = Elm.BarkSpider.embed(node);
 
          function chart(val) {
-             // val is a list of (name, data) tupeles. `data` is a list of (elapsed-time, development-rate) tuples:
+             // val is a list of objects {name: name, color: color, data}. `color` is an (r,
+             // g, b) tuple. `data` is a list of (elapsed-time, development-rate)
+             // tuples:
              //
-             //  [(name, [(elapsed-time, rate), ...]), ...]
-             //
-             // TODO: Plot the rates all at once.
+             //  [{name: "foo", color: [125, 0, 0], data: [(elapsed-time, rate), ...]}, ...]
+
+             var makeColor = function(c) {
+                 var args = c.concat([0.1]).join(', ');
+                 return 'rgba(' + args + ')';
+             }
 
              var datasets = _.map(
                  val,
                  function(dataset) {
                      return {
-                         label: dataset[0],
+                         label: dataset.name,
+                         backgroundColor: makeColor(dataset.color),
                          data: _.map(
-                             dataset[1],
+                             dataset.data,
                              function(data) {
                                  return {
                                      x: data[0],
