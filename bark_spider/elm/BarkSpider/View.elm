@@ -13,9 +13,9 @@ import Bootstrap.Html exposing (..)
 -- import Color exposing (..)
 -- import Dict
 
-import Html exposing (div, Html, hr, h1, node, text)
+import Html exposing (canvas, div, Html, hr, h1, node, text)
 import Html.App
-import Html.Attributes exposing (href, rel, src)
+import Html.Attributes exposing (height, href, id, rel, src, width)
 
 
 -- import Html.Lazy
@@ -97,7 +97,8 @@ view model =
                 8
                 8
                 8
-                [ text (String.concat model.error_messages)
+                [ canvas [ id "bark-spider-canvas", height 1000, width 1000 ] []
+                , text (String.concat model.error_messages)
                 ]
             ]
         ]

@@ -1,19 +1,19 @@
 module BarkSpider.Model exposing (..)
 
 import BarkSpider.Simulation exposing (createSimulation, Parameters, Simulation)
-import Dict
 
 
 type alias ID =
   Int
 
+type alias ElapsedTime  = Int
+type alias DevelopmentRate = Float
+
 
 {-| The "data" payload of a simulation
 -}
 type alias SimulationData =
-  { software_development_rate : Dict.Dict Int Float
-  , elapsed_time : Dict.Dict Int Int
-  }
+    List (ElapsedTime, DevelopmentRate)
 
 
 {-| The results for a single simulation, including metadata, parameters, and data.

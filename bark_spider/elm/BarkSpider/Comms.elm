@@ -7,6 +7,7 @@ This implements the HTTP+JSON protocol that the server uses.
 import BarkSpider.Json exposing (..)
 import BarkSpider.Model exposing (SimulationData, SimulationResults)
 import BarkSpider.Simulation exposing (Parameters, Simulation, simulationToJson)
+import Dict
 import Http
 import Json.Decode
 import Json.Decode exposing ((:=))
@@ -77,10 +78,14 @@ parametersDecoder =
 simulationDataDecoder : Json.Decode.Decoder SimulationData
 simulationDataDecoder =
     let
-        toResults s e =
-            { software_development_rate = toIntKeys s
-            , elapsed_time = toIntKeys e
-            }
+        toList =
+            toIntKeys >> Dict.values
+
+        toResults rates times =
+            List.map2
+                (,)
+                (toList times)
+                (toList rates)
     in
         Json.Decode.object2
             toResults

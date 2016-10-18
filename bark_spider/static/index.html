@@ -16,11 +16,55 @@
 
 	  <script type="text/javascript" src="/static/external/js/jquery.min.js"></script>
 	  <script type="text/javascript" src="/static/external/js/bootstrap.min.js"></script>
+	  <script type="text/javascript" src="/static/external/js/underscore-min.js"></script>
+	  <script type="text/javascript" src="/static/external/js/Chart.js"></script>
     <script type="text/javascript" src="/elm/bark_spider.js"></script>
     <script type="text/javascript">
      setTimeout(function() {
          var node = document.getElementById('bark-spider')
          var app = Elm.BarkSpider.embed(node);
+
+         function chart(val) {
+             // val is a list of (name, data) tupeles. `data` is a list of (elapsed-time, development-rate) tuples:
+             //
+             //  [(name, [(elapsed-time, rate), ...]), ...]
+             //
+             // TODO: Plot the rates all at once.
+
+             var datasets = _.map(
+                 val,
+                 function(dataset) {
+                     return {
+                         label: dataset[0],
+                         data: _.map(
+                             dataset[1],
+                             function(data) {
+                                 return {
+                                     x: data[0],
+                                     y: data[1]
+                                 }
+                             })
+                     }
+                 });
+
+             var ctx = document.getElementById("bark-spider-canvas");
+             var scatterChart = new Chart(ctx, {
+                 type: 'line',
+                 data: {
+                     datasets: datasets
+                 },
+                 options: {
+                     scales: {
+                         xAxes: [{
+                             type: 'linear',
+                             position: 'bottom'
+                         }]
+                     }
+                 }
+             });
+         };
+
+         app.ports.render.subscribe(chart);
      }, 50);
     </script>
 
