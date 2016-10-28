@@ -5,7 +5,8 @@ This implements the HTTP+JSON protocol that the server uses.
 -}
 
 import BarkSpider.Json exposing (..)
-import BarkSpider.Model exposing (SimulationData, SimulationResults)
+import BarkSpider.Model exposing (Model, SimulationData, SimulationResults)
+import BarkSpider.Msg as Msg
 import BarkSpider.Simulation exposing (Parameters, Simulation, simulationToJson)
 import Dict
 import Http
@@ -13,7 +14,9 @@ import Json.Decode
 import Json.Decode exposing ((:=), dict, int, float, string)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode
+import Platform.Cmd
 import Task
+import Task.Extra exposing (performFailproof)
 
 
 --
@@ -144,8 +147,23 @@ requestSimulationResults reqResponse =
             url
 
 
-{-| Combine phasese 1 and 2...probably what you want.
+
+{-| Launch all simulations in a model, resulting in a `NewResults` Msg.
 -}
-runSimulation : Simulation -> Task.Task Http.Error SimulationResults
-runSimulation sim =
-    requestSimulation sim `Task.andThen` requestSimulationResults
+runSimulations : Model -> Platform.Cmd.Cmd Msg.Msg
+runSimulations model =
+    let
+        sims =
+            List.map snd model.simulations
+                |> List.filter .included
+
+        runSim sim =
+            requestSimulation sim `Task.andThen` requestSimulationResults
+
+        task =
+            List.map (runSim >> Task.toResult) sims
+                |> Task.sequence
+    in
+        performFailproof
+            Msg.NewResults
+            task

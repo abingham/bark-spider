@@ -8,7 +8,7 @@ import Http
 type
   Msg
   -- Update the Simulation with the ID
-  = Modify BarkSpider.Model.ID Sim.Msg
+  = UpdateSimulation BarkSpider.Model.ID Sim.Msg
     -- create a new simulation parameter set
   | AddSimulation Sim.Simulation
     -- send parameter sets to server, requesting simulation. Server responds with

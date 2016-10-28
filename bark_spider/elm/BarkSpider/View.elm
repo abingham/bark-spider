@@ -35,7 +35,7 @@ script url =
 
 simView : ( ID, Sim.Simulation ) -> Html Msg
 simView ( id, sim ) =
-    Html.App.map (Modify id) (Sim.view sim)
+    Html.App.map (UpdateSimulation id) (Sim.view sim)
 
 
 

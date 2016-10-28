@@ -3,24 +3,21 @@ module BarkSpider.Update exposing (..)
 import BarkSpider.Chart as Chart
 import BarkSpider.Msg exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
-import BarkSpider.Comms exposing (runSimulation)
+import BarkSpider.Comms as Comms
 import BarkSpider.Simulation as Sim
-import BarkSpider.Util exposing (noFx)
 import Http
 import List
 import List.Extra exposing (filterNot)
-import Platform.Cmd
 import Result exposing (Result)
-import Task
-import Task.Extra exposing (performFailproof)
+import Return exposing (command, map, Return, singleton)
 
 
 {-| Update the simulation parameters by ID based on an .
 -}
-updateModify : ID -> Sim.Msg -> Model -> Model
-updateModify id action model =
+updateSimulation : ID -> Sim.Msg -> Model -> Model
+updateSimulation id action model =
     let
-        modifySimulation ( simId, sim ) =
+        updateSimulation ( simId, sim ) =
             if simId == id then
                 ( simId, Sim.update action sim )
             else
@@ -35,15 +32,15 @@ updateModify id action model =
                     filterNot matchId model.simulations
 
                 _ ->
-                    List.map modifySimulation model.simulations
+                    List.map updateSimulation model.simulations
     in
         { model | simulations = sims }
 
 
 {-| Add a simulation to a model using the next available ID.
 -}
-addSimulation : Model -> Sim.Simulation -> Model
-addSimulation model sim =
+addSimulation : Sim.Simulation -> Model -> Model
+addSimulation sim model =
     { model
         | simulations = model.simulations ++ [ ( model.next_id, sim ) ]
         , next_id = model.next_id + 1
@@ -57,25 +54,6 @@ clearSimulationResults model =
     { model
         | results = []
     }
-
-
-{-| Launch all simulations in a model as Effects that come back as NewResults
-actions.
--}
-runSimulations : Model -> Platform.Cmd.Cmd Msg
-runSimulations model =
-    let
-        sims =
-            List.map snd model.simulations
-                |> List.filter .included
-
-        task =
-            List.map (runSimulation >> Task.toResult) sims
-                |> Task.sequence
-    in
-        performFailproof
-            NewResults
-            task
 
 
 {-| Append simulation results (or errors) to a model.
@@ -96,22 +74,20 @@ handleNewResult result model =
 
 {-| Update a model and/or launch effects based on an action.
 -}
-update : Msg -> Model -> ( Model, Platform.Cmd.Cmd Msg )
+update : Msg -> Model -> Return Msg Model
 update action model =
-    case action of
-        Modify index action ->
-            updateModify index action model
-                |> noFx
+    singleton model
+        |> case action of
+            UpdateSimulation index action ->
+                map (updateSimulation index action)
 
-        AddSimulation sim ->
-            addSimulation model sim |> noFx
+            AddSimulation sim ->
+                map (addSimulation sim)
 
-        RunSimulation ->
-            ( clearSimulationResults model
-            , runSimulations model
-            )
+            RunSimulation ->
+                map clearSimulationResults
+                    >> command (Comms.runSimulations model)
 
-        NewResults results ->
-            ( List.foldl handleNewResult model results
-            , Chart.plot results
-            )
+            NewResults results ->
+                map (\m -> List.foldl handleNewResult m results)
+                    >> command (Chart.plot results)

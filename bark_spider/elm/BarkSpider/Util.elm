@@ -1,12 +1,4 @@
-module BarkSpider.Util exposing (distinctColors, noFx)
-
-
-import Platform.Cmd
-
-
-noFx : model -> ( model, Platform.Cmd.Cmd a )
-noFx model =
-    ( model, Platform.Cmd.none )
+module BarkSpider.Util exposing (distinctColors)
 
 
 {-| A sequence of RGB color tuples which are fairly distinct.
