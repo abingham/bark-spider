@@ -73,9 +73,6 @@ runSimulations model =
             List.map (runSimulation >> Task.toResult) sims
                 |> Task.sequence
     in
-        -- TODO: This feels like a hack. The task.perform should never fail
-        -- (because of task.toResult above, failure here is meaningless). But task
-        -- perform requires *something* in this slot. Are we doing this wrong?
         performFailproof
             NewResults
             task
