@@ -1,17 +1,18 @@
 from aiohttp import web
+from aiohttp.file_sender import FileSender
 from bark_spider.intervention import ParseError
 from bark_spider.json_util import DataFrameJSONEncoder
 from bark_spider.simulation_db import SimulationDatabase
 from functools import partial
 import json
-
-# TODO: We should probably be attaching this to the request or something,
-# right
-sim_db = SimulationDatabase()
+from pathlib import Path
 
 
 async def root(request):
-    return web.HTTPFound('static/index.html')
+    fs = FileSender()
+    path = Path('bark_spider/static/index.html')
+    result = await fs.send(request, path)
+    return result
 
 
 async def handle_simulate(request):
@@ -20,7 +21,7 @@ async def handle_simulate(request):
     params = data['parameters']
 
     try:
-        name_hash, _ = sim_db.add_results(name, params)
+        name_hash, _ = request.app['simdb'].add_results(name, params)
     except ParseError as e:
         return web.HTTPBadRequest(body=str(e))
 
@@ -34,7 +35,7 @@ async def handle_simulation(request):
     name_hash = request.match_info['id']
 
     try:
-        name, sim_params, sim_results = sim_db.lookup(name_hash)
+        name, sim_params, sim_results = request.app['simdb'].lookup(name_hash)
     except KeyError as e:
         raise web.HTTPNotFound(body="No such simulation id {}".format(e))
 
@@ -50,6 +51,7 @@ async def handle_simulation(request):
 
 
 app = web.Application()
+app['simdb'] = SimulationDatabase()
 # TODO: What's the correct way to set the path to static and elm? Through a config file? How does the pyramid version do it?
 app.router.add_static('/static/',
                       path='bark_spider/static',
