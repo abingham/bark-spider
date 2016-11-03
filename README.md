@@ -69,7 +69,6 @@ point a browser at localhost:6543 to run the tool.
 3. Make sure you have a few non-Python dependencies:
 
   - [elm](http://elm-lang.org/install): Version 0.17. Use the correct installer for your system, or try `npm install -g elm`.
-  - [bower](http://bower.io/): Try `npm install -g bower`.
 
 3. Build the Elm elements of the system:
 
