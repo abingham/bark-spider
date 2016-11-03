@@ -9,11 +9,6 @@ import json
 # right
 sim_db = SimulationDatabase()
 
-# async def handle(request):
-#     name = request.match_info.get('name', "Anonymous")
-#     text = "Hello, " + name
-#     return web.Response(text=text)
-
 
 async def root(request):
     return web.HTTPFound('static/index.html')
@@ -27,8 +22,6 @@ async def handle_simulate(request):
     try:
         name_hash, _ = sim_db.add_results(name, params)
     except ParseError as e:
-        # Note the dissonance here. The intervention ParseError happens here
-        # because of lazy parsing, while you might expect it to happen above.
         return web.HTTPBadRequest(body=str(e))
 
     return web.json_response({
@@ -37,7 +30,7 @@ async def handle_simulate(request):
     })
 
 
-def handle_simulation(request):
+async def handle_simulation(request):
     name_hash = request.match_info['id']
 
     try:
@@ -57,6 +50,7 @@ def handle_simulation(request):
 
 
 app = web.Application()
+# TODO: What's the correct way to set the path to static and elm? Through a config file? How does the pyramid version do it?
 app.router.add_static('/static/',
                       path='bark_spider/static',
                       name='static')
