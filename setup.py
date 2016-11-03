@@ -10,14 +10,9 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     # 'brooks',
+    'aiohttp',
     'pandas',
-    'paste',
-    'pastedeploy',
-    'pyramid',
-    'pyramid_chameleon',
-    'pyramid_debugtoolbar',
     'stevedore',
-    'waitress',
     ]
 
 setup(name='bark_spider',
@@ -26,7 +21,6 @@ setup(name='bark_spider',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
-        "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
@@ -40,9 +34,4 @@ setup(name='bark_spider',
       install_requires=requires,
       tests_require=requires,
       test_suite="bark_spider",
-      entry_points={
-          'paste.app_factory': {
-              'main = bark_spider:main'
-          }
-      }
 )
