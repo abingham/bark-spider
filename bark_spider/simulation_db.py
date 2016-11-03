@@ -1,4 +1,8 @@
+import asyncio
+from bark_spider.intervention import parse_interventions
+from bark_spider.simulation.simulation import run_simulation
 import hashlib
+from io import StringIO
 import json
 
 
@@ -7,13 +11,24 @@ class SimulationDatabase:
         self._names = {}  # hash(name + params) -> (name, hash(params))
         self._results = {}  # hash(params) -> (params, results)
 
-    def add_results(self, name, params, gen):
+    def add_results(self, name, params):
+        # We have to distinguish between a) *index params* which are used to
+        # calculate the index in the database and b) *run params* which contain
+        # parsed interventions (and are hence not json-serializable and
+        # therefor not suitable for indexing).
+        run_params = params.copy()
+        run_params['interventions'] = parse_interventions(
+            StringIO(run_params['interventions']))
         name_hash, params_hash = self._hash_request(name, params)
         self._names[name_hash] = (name, params_hash)
 
-        if params_hash not in self._results:
-            results = gen()
+        async def run():
+            # TODO: Should run_simulation be async? Doesn't seem so.
+            results = run_simulation(run_params)
             self._results[params_hash] = (params, results)
+
+        if params_hash not in self._results:
+            asyncio.ensure_future(run())
 
         return (name_hash, params_hash)
 
