@@ -50,23 +50,24 @@ async def handle_simulation(request):
         dumps=partial(json.dumps, cls=DataFrameJSONEncoder))
 
 
-app = web.Application()
-app['simdb'] = SimulationDatabase()
-# TODO: What's the correct way to set the path to static and elm? Through a config file? How does the pyramid version do it?
-app.router.add_static('/static/',
-                      path='bark_spider/static',
-                      name='static')
-app.router.add_static('/elm/',
-                      name='elm',
-                      path='bark_spider/elm',)
-app.router.add_get('/',
-                   root,
-                   name='root')
-app.router.add_post('/simulate',
-                    handle_simulate,
-                    name='simulate')
-app.router.add_get('/simulation/{id}',
-                   handle_simulation,
-                   name='simulation')
-
-web.run_app(app)
+def app():
+    app = web.Application()
+    app['simdb'] = SimulationDatabase()
+    # TODO: What's the correct way to set the path to static and elm? Through a
+    # config file? How does the pyramid version do it?
+    app.router.add_static('/static/',
+                          path='bark_spider/static',
+                          name='static')
+    app.router.add_static('/elm/',
+                          name='elm',
+                          path='bark_spider/elm',)
+    app.router.add_get('/',
+                       root,
+                       name='root')
+    app.router.add_post('/simulate',
+                        handle_simulate,
+                        name='simulate')
+    app.router.add_get('/simulation/{id}',
+                       handle_simulation,
+                       name='simulation')
+    return app

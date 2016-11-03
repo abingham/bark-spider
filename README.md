@@ -47,7 +47,7 @@ python setup.py install
 6. Start the server:
 
 ```shell
-python -m bark_spider.app
+python bark_spider
 ```
 
 
