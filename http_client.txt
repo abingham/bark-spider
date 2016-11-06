@@ -1,0 +1,22 @@
+# -*- restclient -*-
+
+#
+# Post works too, entity just goes after an empty line. Same is for PUT.
+#
+POST http://localhost:8080/simulate
+Content-Type: application/json
+
+{"name": "test params",
+ "parameters": {
+         "assimilation_delay": 20,
+         "training_overhead_proportion": 0.25,
+         "interventions": "",
+         "num_function_points_requirements": 10
+     }
+}
+
+#
+# Get the results of a simulation
+#
+
+GET http://localhost:8080/simulation/738becc9769b39c8d620d1e3c8ef8067442c436d
