@@ -1,5 +1,5 @@
 import asyncio
-from bark_spider.intervention import parse_interventions
+from bark_spider.intervention import parse_interventions, ParseError
 from bark_spider.simulation.simulation import run_simulation
 import hashlib
 from io import StringIO
@@ -7,9 +7,10 @@ import json
 
 
 class SimulationDatabase:
-    def __init__(self):
+    def __init__(self, loop):
         self._names = {}  # hash(name + params) -> (name, hash(params))
         self._results = {}  # hash(params) -> (params, results)
+        self._loop = loop
 
     def add_results(self, name, params):
         # We have to distinguish between a) *index params* which are used to
@@ -22,13 +23,29 @@ class SimulationDatabase:
         name_hash, params_hash = self._hash_request(name, params)
         self._names[name_hash] = (name, params_hash)
 
-        async def run():
-            # TODO: Should run_simulation be async? Doesn't seem so.
-            results = run_simulation(run_params)
-            self._results[params_hash] = (params, results)
+        def result(status, **kwargs):
+            d = dict(**kwargs)
+            d.update({
+                'status': status,
+                'params': params,
+                'name': name
+            })
+            return d
 
-        if params_hash not in self._results:
-            asyncio.ensure_future(run())
+        self._results[params_hash] = result('in-progress')
+
+        def run():
+            try:
+                results = run_simulation(run_params)
+                self._results[params_hash] = result(
+                    'success',
+                    results=results)
+            except ParseError as e:
+                self._results[params_hash] = result(
+                    'error',
+                    message=e.message)
+
+        self._loop.call_soon(run)
 
         return (name_hash, params_hash)
 
@@ -36,14 +53,15 @@ class SimulationDatabase:
         """Lookup the simulation results associated with name_hash.
 
         Returns:
+            # TODO UPDATE THIS. IT'S WRONG.
             A 3-tuple of (name, params, results).
 
         Raises:
             KeyError: If there are no results associated with name_hash.
+
         """
         name, params_hash = self._names[name_hash]
-        params, results = self._results[params_hash]
-        return (name, params, results)
+        return self._results[params_hash]
 
     @staticmethod
     def _hash_request(name, params):

@@ -7,8 +7,9 @@ _INTERVENTIONS = None
 
 
 class ParseError(Exception):
-    pass
-
+    @property
+    def message(self):
+        return self.args[0]
 
 def _interventions():
     """Get the dict mapping tag names to Intervention subclasses.

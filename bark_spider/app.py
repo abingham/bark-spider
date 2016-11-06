@@ -20,10 +20,7 @@ async def handle_simulate(request):
     name = data['name']
     params = data['parameters']
 
-    try:
-        name_hash, _ = request.app['simdb'].add_results(name, params)
-    except ParseError as e:
-        return web.HTTPBadRequest(body=str(e))
+    name_hash, _ = request.app['simdb'].add_results(name, params)
 
     return web.json_response({
         'url': request.app.router['simulation'].url(parts={"id": name_hash}),
@@ -35,24 +32,18 @@ async def handle_simulation(request):
     name_hash = request.match_info['id']
 
     try:
-        name, sim_params, sim_results = request.app['simdb'].lookup(name_hash)
+        results = request.app['simdb'].lookup(name_hash)
     except KeyError as e:
         raise web.HTTPNotFound(body="No such simulation id {}".format(e))
-
-    results = {
-        'name': name,
-        'parameters': sim_params,
-        'results': sim_results
-    }
 
     return web.json_response(
         results,
         dumps=partial(json.dumps, cls=DataFrameJSONEncoder))
 
 
-def app():
-    app = web.Application()
-    app['simdb'] = SimulationDatabase()
+def make_app(*args, **kwargs):
+    app = web.Application(*args, **kwargs)
+    app['simdb'] = SimulationDatabase(app.loop)
     # TODO: What's the correct way to set the path to static and elm? Through a
     # config file? How does the pyramid version do it?
     app.router.add_static('/static/',
