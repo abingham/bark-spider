@@ -1,19 +1,21 @@
 module BarkSpider.View exposing (..)
 
 import BarkSpider.Msg exposing (..)
-import BarkSpider.Model exposing (ID, Model, SimulationResults)
+import BarkSpider.Model as Model
+import BarkSpider.Model exposing (ID, Model)
 import BarkSpider.Simulation as Sim
 
 
 -- import BarkSpider.Util exposing (distinctColors)
 
 import Bootstrap.Html exposing (..)
+import Dict
 
 
 -- import Color exposing (..)
 -- import Dict
 
-import Html exposing (canvas, div, Html, hr, h1, node, text)
+import Html exposing (canvas, div, Html, hr, h1, li, node, text, ul)
 import Html.App
 import Html.Attributes exposing (height, href, id, rel, src, width)
 
@@ -71,6 +73,22 @@ simView ( id, sim ) =
 --         div [] []
 
 
+errorList : Model -> Html Msg
+errorList model =
+    ul []
+        (List.map
+            (\status ->
+                case status of
+                    Model.Error msg ->
+                        li [] [ text msg ]
+
+                    _ ->
+                        li [] [ text "ok" ]
+            )
+            (Dict.values model.results)
+        )
+
+
 view : Model -> Html Msg
 view model =
     containerFluid_
@@ -97,7 +115,8 @@ view model =
                 8
                 8
                 8
-                [ canvas [ id "bark-spider-canvas", height 1000, width 1000 ] []
+                [ errorList model
+                , canvas [ id "bark-spider-canvas", height 1000, width 1000 ] []
                 , text (String.concat model.error_messages)
                 ]
             ]

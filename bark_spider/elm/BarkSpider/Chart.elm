@@ -2,6 +2,9 @@ port module BarkSpider.Chart exposing (..)
 
 import BarkSpider.Model as Model
 import BarkSpider.Util as Util
+import Dict
+import List
+import Maybe
 
 
 type alias ChartData =
@@ -11,26 +14,32 @@ type alias ChartData =
     }
 
 
-plot : List (Result err Model.SimulationResults) -> Cmd msg
-plot results =
+plottable : Model.Model -> List ( String, Model.SimulationData )
+plottable model =
     let
-        successes =
-            List.foldl
-                (\next accum ->
-                    case next of
-                        Ok r ->
-                            r :: accum
+        successes ( id, sim ) sims =
+            case Dict.get id model.results of
+                Maybe.Just status ->
+                    case status of
+                        Model.Success data ->
+                            ( sim.name, data ) :: sims
 
                         _ ->
-                            accum
-                )
-                []
-                results
+                            sims
 
+                Maybe.Nothing ->
+                    sims
+    in
+        List.foldl successes [] model.simulations
+
+
+plot : Model.Model -> Cmd msg
+plot model =
+    let
         colored =
             List.map2
-                (\r color -> { name = r.name, data = r.data, color = color })
-                successes
+                (\( name, data ) color -> { name = name, data = data, color = color })
+                (plottable model)
                 Util.distinctColors
     in
         render colored
