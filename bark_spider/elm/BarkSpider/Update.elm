@@ -1,15 +1,14 @@
 module BarkSpider.Update exposing (..)
 
-import BarkSpider.Chart as Chart
+-- import BarkSpider.Chart as Chart
 import BarkSpider.Msg exposing (..)
 import BarkSpider.Model exposing (ID, Model, SimulationResults)
 import BarkSpider.Comms as Comms
 import BarkSpider.Simulation as Sim
-import Http
+import Dict
 import List
 import List.Extra exposing (filterNot)
-import Result exposing (Result)
-import Return exposing (command, map, Return, singleton)
+import Return exposing (command, map, Return, singleton, zero)
 
 
 {-| Update the simulation parameters by ID based on an .
@@ -52,24 +51,22 @@ addSimulation sim model =
 clearSimulationResults : Model -> Model
 clearSimulationResults model =
     { model
-        | results = []
+        | results = Dict.empty
     }
 
 
-{-| Append simulation results (or errors) to a model.
--}
-handleNewResult : Result Http.Error SimulationResults -> Model -> Model
-handleNewResult result model =
-    case result of
-        Ok r ->
-            { model
-                | results = r :: model.results
-            }
 
-        Err error ->
-            { model
-                | error_messages = (toString error) :: model.error_messages
-            }
+-- handleNewResult : Result Http.Error SimulationResults -> Model -> Model
+-- handleNewResult result model =
+--     case result of
+--         Ok r ->
+--             { model
+--                 | results = r :: model.results
+--             }
+--         Err error ->
+--             { model
+--                 | error_messages = (toString error) :: model.error_messages
+--             }
 
 
 {-| Update a model and/or launch effects based on an action.
@@ -84,10 +81,18 @@ update action model =
             AddSimulation sim ->
                 map (addSimulation sim)
 
-            RunSimulation ->
+            RunSimulations ->
                 map clearSimulationResults
-                    >> command (Comms.runSimulations model)
+                    >> (\r -> List.foldl command r (Comms.runSimulations model))
 
-            NewResults results ->
-                map (\m -> List.foldl handleNewResult m results)
-                    >> command (Chart.plot results)
+            SimulationSuccess id response ->
+                zero
+
+            SimulationError id error ->
+                zero
+
+            SimulationStatusSuccess id status ->
+                zero
+
+            SimulationStatusError id error ->
+                zero

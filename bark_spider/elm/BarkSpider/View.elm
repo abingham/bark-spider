@@ -86,7 +86,7 @@ view model =
                         12
                         12
                         [ btnDefault' "" { btnParam | label = Just "Add parameter set" } (AddSimulation (Sim.createSimulation "unnamed"))
-                        , btnDefault' "pull-right btn-primary" { btnParam | label = Just "Run simulation" } RunSimulation
+                        , btnDefault' "pull-right btn-primary" { btnParam | label = Just "Run simulation" } RunSimulations
                         ]
                     ]
                  , hr [] []

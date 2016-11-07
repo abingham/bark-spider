@@ -1,10 +1,11 @@
--- Json utilities
-
-
 module BarkSpider.Json exposing (..)
 
+import BarkSpider.Model as Model
+import BarkSpider.Simulation as Simulation
 import Dict
 import Json.Decode
+import Json.Decode exposing ((:=), andThen, dict, int, float, string)
+import Json.Decode.Pipeline exposing (custom, decode, hardcoded, required)
 import List
 import Result
 import String
@@ -43,3 +44,84 @@ stringFloatDecoder =
 stringIntDecoder : Json.Decode.Decoder Int
 stringIntDecoder =
   stringDecoder -1 String.toInt
+
+-- This is what we get back as simulation results:
+--
+-- {"results":
+--   {"software_development_rate": {"<step>": "<rate (float)>", . . .},
+--    "step_number": {"<step>": "<step>", . . .},
+--    "elapsed_time": {"<step>": "<elapsed time (int)>", . . .}},
+--  "parameters": {"interventions": "add 100 10", "assimilation_delay": 20, "training_overhead_proportion": 0.25}, "name": "+10 @ 100d"}
+--
+-- JSON decoders
+--
+
+
+requestResponseDecoder : Json.Decode.Decoder Model.RequestResponse
+requestResponseDecoder =
+    let
+        toResponse url result_id =
+            { url = url
+            , result_id = result_id
+            }
+    in
+        decode Model.RequestResponse
+            |> required "url" string
+            |> required "result-id" string
+
+
+parametersDecoder : Json.Decode.Decoder Simulation.Parameters
+parametersDecoder =
+    let
+        toParameter a t i =
+            { assimilation_delay = a
+            , training_overhead_proportion = t
+            , interventions = i
+            }
+    in
+        decode Simulation.Parameters
+            |> required "assimilation_delay" int
+            |> required "training_overhead_proportion" float
+            |> required "interventions" string
+
+
+simulationDataDecoder : Json.Decode.Decoder Model.SimulationData
+simulationDataDecoder =
+    let
+        keys =
+            toIntKeys >> Dict.values
+
+        toResults rates times =
+            List.map2 (,) (keys times) (keys rates)
+    in
+        decode toResults
+            |> required "software_development_rate" (dict stringFloatDecoder)
+            |> required "elapsed_time" (dict stringIntDecoder)
+
+
+simulationStatusDecoder : Json.Decode.Decoder Model.SimulationStatus
+simulationStatusDecoder =
+    let
+        stringToStatus s =
+            case s of
+                "in-progress" ->
+                    Model.InProgress
+                "success" ->
+                    Model.InProgress -- TODO!
+                "error" ->
+                    Model.InProgress -- TODO!
+                _ ->
+                    Model.InProgress -- TODO!
+
+        decoder =
+            stringToStatus >> decode
+
+    in
+        ("status" := string) `andThen` decoder
+
+simulationResultsDecoder : Json.Decode.Decoder Model.SimulationResults
+simulationResultsDecoder =
+    decode Model.SimulationResults
+        |> required "name" string
+        |> required "parameters" parametersDecoder
+        |> custom simulationStatusDecoder
