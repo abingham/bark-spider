@@ -102,20 +102,21 @@ simulationDataDecoder =
 simulationStatusDecoder : Json.Decode.Decoder Model.SimulationStatus
 simulationStatusDecoder =
     let
-        stringToStatus s =
-            case s of
+        decoder status =
+            case status of
                 "in-progress" ->
-                    Model.InProgress
+                    decode Model.InProgress
+
                 "success" ->
-                    Model.InProgress -- TODO!
+                    decode Model.Success
+                        |> custom simulationDataDecoder
+
                 "error" ->
-                    Model.InProgress -- TODO!
+                    decode Model.Error
+                        |> required "message" string
+
                 _ ->
-                    Model.InProgress -- TODO!
-
-        decoder =
-            stringToStatus >> decode
-
+                    decode (Model.Error "Unknown error")
     in
         ("status" := string) `andThen` decoder
 
