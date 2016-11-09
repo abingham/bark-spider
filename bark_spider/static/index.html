@@ -29,49 +29,49 @@
 
      function chart(val) {
          setTimeout(function() {
-         // val is a list of objects {name: name, color: color, data}. `color` is an (r,
-         // g, b) tuple. `data` is a list of (elapsed-time, development-rate)
-         // tuples:
-         //
-         //  [{name: "foo", color: [125, 0, 0], data: [(elapsed-time, rate), ...]}, ...]
-         var makeColor = function(c) {
-             var args = c.concat([0.1]).join(', ');
-             return 'rgba(' + args + ')';
-         }
+            // val is a list of objects {name: name, color: color, data}. `color` is an (r,
+            // g, b) tuple. `data` is a list of (elapsed-time, development-rate)
+            // tuples:
+            //
+            //  [{name: "foo", color: [125, 0, 0], data: [(elapsed-time, rate), ...]}, ...]
+            var makeColor = function(c) {
+                var args = c.concat([0.1]).join(', ');
+                return 'rgba(' + args + ')';
+            }
 
-         var datasets = _.map(
-             val,
-             function(dataset) {
-                 return {
-                     label: dataset.name,
-                     backgroundColor: makeColor(dataset.color),
-                     data: _.map(
-                         dataset.data,
-                         function(data) {
-                             return {
-                                 x: data[0],
-                                 y: data[1]
-                             }
-                         })
-                 }
-             });
+            var datasets = _.map(
+                val,
+                function(dataset) {
+                    return {
+                        label: dataset.name,
+                        backgroundColor: makeColor(dataset.color),
+                        data: _.map(
+                            dataset.data,
+                            function(data) {
+                                return {
+                                    x: data[0],
+                                    y: data[1]
+                                }
+                            })
+                    }
+                });
 
-         var ctx = document.getElementById("bark-spider-canvas");
+            var ctx = document.getElementById("bark-spider-canvas");
 
-         brooksChart = new Chart(ctx, {
-             type: 'line',
-             data: {
-                 datasets: datasets
-             },
-             options: {
-                 scales: {
-                     xAxes: [{
-                         type: 'linear',
-                         position: 'bottom'
-                     }]
-                 }
-             }
-         });
+            brooksChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    scales: {
+                        xAxes: [{
+                            type: 'linear',
+                            position: 'bottom'
+                        }]
+                    }
+                }
+            });
          }, 50);
      };
 
