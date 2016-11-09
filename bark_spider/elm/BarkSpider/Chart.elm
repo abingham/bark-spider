@@ -46,3 +46,6 @@ plot model =
 
 
 port render : List ChartData -> Cmd msg
+
+
+port clear : () -> Cmd msg

@@ -123,6 +123,7 @@ update action model =
 
             RunSimulations ->
                 map clearSimulationResults
+                    >> command (Chart.clear ())
                     >> (\r -> List.foldl command r (Comms.runSimulations model))
 
             SimulationSuccess id url ->

@@ -17,7 +17,7 @@ import Dict
 
 import Html exposing (canvas, div, Html, hr, h1, li, node, text, ul)
 import Html.App
-import Html.Attributes exposing (height, href, id, rel, src, width)
+import Html.Attributes exposing (class, height, href, id, rel, src, width)
 
 
 -- import Html.Lazy
@@ -75,18 +75,30 @@ simView ( id, sim ) =
 
 errorList : Model -> Html Msg
 errorList model =
-    ul []
-        (List.map
-            (\status ->
-                case status of
-                    Model.Error msg ->
-                        li [] [ text msg ]
+    let
+        errors =
+            List.foldl
+                (\status errs ->
+                    case status of
+                        Model.Success _ ->
+                            "success" :: errs
 
-                    _ ->
-                        li [] [ text "ok" ]
-            )
-            (Dict.values model.results)
-        )
+                        Model.Error msg ->
+                            msg :: errs
+
+                        Model.InProgress url ->
+                            url :: errs
+                )
+                []
+                (Dict.values model.results)
+    in
+        row_ <|
+            List.map
+                (\err ->
+                    div [ class "alert alert-warning" ]
+                        [ text err ]
+                )
+                <| List.concat [errors, model.error_messages]
 
 
 view : Model -> Html Msg
