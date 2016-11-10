@@ -58,10 +58,8 @@ python bark_spider
 
 ## Testing
 
-**NB: This is out of date right now. Sorry.**
-
 To run the JSON API approval tests:
 
-    python -m unittest bark_spider.tests
+    pytest tests
 
 More tests coming soon...
