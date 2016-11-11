@@ -1,6 +1,5 @@
 module BarkSpider.Update exposing (..)
 
-import BarkSpider.Chart as Chart
 import BarkSpider.Msg exposing (..)
 import BarkSpider.Model as Model
 import BarkSpider.Comms as Comms
@@ -76,39 +75,6 @@ handleSimulateSuccess id status_url =
         >> fetchResults id status_url
 
 
-handleSimulationSuccess : Model.ID -> Model.SimulationStatus -> RType -> RType
-handleSimulationSuccess id status =
-    let
-        isComplete s =
-            case s of
-                Model.Success _ ->
-                    True
-
-                Model.Error _ ->
-                    True
-
-                _ ->
-                    False
-
-        cmd =
-            case status of
-                Model.InProgress status_url ->
-                    fetchResults id status_url
-
-                Model.Success data ->
-                    (\( model, cmd ) ->
-                        if (List.all isComplete (Dict.values model.results)) then
-                            command (Chart.plot model) ( model, cmd )
-                        else
-                            Return.return model cmd
-                    )
-
-                _ ->
-                    zero
-    in
-        setStatus id status >> cmd
-
-
 {-| Update a model and/or launch effects based on an action.
 -}
 update : Msg -> Model.Model -> RType
@@ -123,8 +89,9 @@ update action model =
 
             RunSimulations ->
                 map clearSimulationResults
-                    >> command (Chart.clear ())
-                    >> (\r -> List.foldl command r (Comms.runSimulations model))
+                    -- >> command (Chart.clear ())
+                    >>
+                        (\r -> List.foldl command r (Comms.runSimulations model))
 
             SimulationSuccess id url ->
                 handleSimulateSuccess id url
@@ -133,7 +100,7 @@ update action model =
                 setStatus id (Model.Error error)
 
             SimulationStatusSuccess id status ->
-                handleSimulationSuccess id status
+                setStatus id status
 
             SimulationStatusError id error ->
                 setStatus id (Model.Error error)
