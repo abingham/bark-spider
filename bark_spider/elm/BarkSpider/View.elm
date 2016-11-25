@@ -9,7 +9,6 @@ import BarkSpider.Simulation as Sim
 -- import BarkSpider.Util exposing (distinctColors)
 
 import Bootstrap.Html exposing (..)
-import Dict
 
 
 -- import Color exposing (..)
