@@ -2,6 +2,7 @@ module BarkSpider.Model exposing (..)
 
 import Dict
 import BarkSpider.Simulation exposing (createSimulation, Parameters, Simulation)
+import Monocle.Lens exposing (Lens)
 
 
 type alias ID =
@@ -40,6 +41,11 @@ type alias Model =
     , error_messages : List String
     , next_id : Int
     }
+
+
+results : Lens Model (Dict.Dict Int SimulationStatus)
+results =
+    Lens .results (\r m -> { m | results = r })
 
 
 createModel : Model

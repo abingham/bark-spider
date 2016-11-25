@@ -3,11 +3,13 @@ module BarkSpider.Update exposing (..)
 import BarkSpider.Chart as Chart
 import BarkSpider.Msg exposing (..)
 import BarkSpider.Model as Model
+import BarkSpider.Model exposing (results)
 import BarkSpider.Comms as Comms
 import BarkSpider.Simulation as Sim
 import Dict
 import List
 import List.Extra exposing (filterNot)
+import Monocle.Lens as Lens
 import Return exposing (command, effect, map, Return, singleton, zero)
 import Time
 
@@ -53,16 +55,14 @@ addSimulation sim model =
 
 {-| Remove all simulation results from a model.
 -}
-clearSimulationResults : Model.Model -> Model.Model
-clearSimulationResults model =
-    { model
-        | results = Dict.empty
-    }
+clearSimulationResults : RType -> RType
+clearSimulationResults =
+    map (results.set Dict.empty)
 
 
 setStatus : Model.ID -> Model.SimulationStatus -> RType -> RType
 setStatus id status =
-    map (\m -> { m | results = Dict.insert id status m.results })
+    map <| Lens.modify results <| Dict.insert id status
 
 
 fetchResults : Model.ID -> Model.URL -> RType -> RType
@@ -122,7 +122,7 @@ update action model =
                 map (addSimulation sim)
 
             RunSimulations ->
-                map clearSimulationResults
+                clearSimulationResults
                     >> command (Chart.clear ())
                     >> (\r -> List.foldl command r (Comms.runSimulations model))
 

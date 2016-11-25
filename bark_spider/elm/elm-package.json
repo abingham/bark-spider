@@ -14,6 +14,7 @@
         "Fresheyeball/elm-return": "4.0.0 <= v < 5.0.0",
         "NoRedInk/elm-decode-pipeline": "2.0.0 <= v < 3.0.0",
         "NoRedInk/elm-task-extra": "2.0.0 <= v < 3.0.0",
+        "arturopala/elm-monocle": "1.2.1 <= v < 1.2.2",
         "athanclark/elm-param-parsing-2": "1.0.0 <= v < 2.0.0",
         "circuithub/elm-bootstrap-html": "7.0.0 <= v < 8.0.0",
         "elm-community/list-extra": "3.1.0 <= v < 4.0.0",
