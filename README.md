@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 3. Make sure you have a few non-Python dependencies:
 
-  - [elm](http://elm-lang.org/install): Version 0.17. Use the correct installer for your system, or try `npm install -g elm`.
+  - [elm](http://elm-lang.org/install): Version 0.17. Use the correct installer for your system, or try `npm install -g elm@0.17.0`.
 
 4. Build the Elm elements of the system:
 
