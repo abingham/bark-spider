@@ -48,6 +48,16 @@ results =
     Lens .results (\r m -> { m | results = r })
 
 
+next_id : Lens Model ID
+next_id =
+    Lens .next_id (\n m -> { m | next_id = n })
+
+
+simulations : Lens Model (List ( ID, Simulation ))
+simulations =
+    Lens .simulations (\s m -> { m | simulations = s })
+
+
 createModel : Model
 createModel =
     let
