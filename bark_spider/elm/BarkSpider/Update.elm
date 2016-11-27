@@ -6,6 +6,7 @@ import BarkSpider.Model as Model
 import BarkSpider.Model exposing (results)
 import BarkSpider.Comms as Comms
 import BarkSpider.Simulation as Sim
+import BarkSpider.Util exposing (tuple)
 import Dict
 import List
 import List.Extra exposing (filterNot)
@@ -18,10 +19,14 @@ type alias RType =
     Return Msg Model.Model
 
 
+type alias RFType =
+    RType -> RType
+
+
 {-| Update the simulation parameters by ID based on an .
 -}
-updateSimulation : Model.ID -> Sim.Msg -> Model.Model -> Model.Model
-updateSimulation id action model =
+updateSimulation : Model.ID -> Sim.Msg -> RFType
+updateSimulation id action =
     let
         updateSimulation ( simId, sim ) =
             if simId == id then
@@ -29,54 +34,52 @@ updateSimulation id action model =
             else
                 ( simId, sim )
 
-        matchId ( simId, sim ) =
-            simId == id
-
-        sims =
+        newSims =
             case action of
                 Sim.Delete ->
-                    filterNot matchId model.simulations
+                    filterNot (\( simId, _ ) -> simId == id)
 
                 _ ->
-                    List.map updateSimulation model.simulations
+                    List.map updateSimulation
     in
-        { model | simulations = sims }
+        map <| Lens.modify Model.simulations newSims
 
 
 {-| Add a simulation to a model using the next available ID.
 -}
 addSimulation : Sim.Simulation -> Model.Model -> Model.Model
-addSimulation sim model =
-    { model
-        | simulations = model.simulations ++ [ ( model.next_id, sim ) ]
-        , next_id = model.next_id + 1
-    }
+addSimulation sim =
+    let
+        lens =
+            tuple Model.next_id Model.simulations
+    in
+        Lens.modify lens (\( n, s ) -> ( n + 1, s ++ [ ( n, sim ) ] ))
 
 
 {-| Remove all simulation results from a model.
 -}
-clearSimulationResults : RType -> RType
+clearSimulationResults : RFType
 clearSimulationResults =
-    map (results.set Dict.empty)
+    map <| Lens.modify results (\_ -> Dict.empty)
 
 
-setStatus : Model.ID -> Model.SimulationStatus -> RType -> RType
+setStatus : Model.ID -> Model.SimulationStatus -> RFType
 setStatus id status =
     map <| Lens.modify results <| Dict.insert id status
 
 
-fetchResults : Model.ID -> Model.URL -> RType -> RType
+fetchResults : Model.ID -> Model.URL -> RFType
 fetchResults id status_url =
     command <| Comms.requestSimulationResults id status_url <| Time.second * 0.1
 
 
-handleSimulateSuccess : Model.ID -> Model.URL -> RType -> RType
+handleSimulateSuccess : Model.ID -> Model.URL -> RFType
 handleSimulateSuccess id status_url =
     setStatus id (Model.InProgress status_url)
         >> fetchResults id status_url
 
 
-handleSimulationSuccess : Model.ID -> Model.SimulationStatus -> RType -> RType
+handleSimulationSuccess : Model.ID -> Model.SimulationStatus -> RFType
 handleSimulationSuccess id status =
     let
         isComplete s =
@@ -116,10 +119,10 @@ update action model =
     singleton model
         |> case action of
             UpdateSimulation index action ->
-                map (updateSimulation index action)
+                updateSimulation index action
 
             AddSimulation sim ->
-                map (addSimulation sim)
+                map <| addSimulation sim
 
             RunSimulations ->
                 clearSimulationResults
